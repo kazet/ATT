@@ -1,0 +1,17 @@
+class: SentenceSimilarityAligner
+languages:
+  - "en"
+  - "de"
+  - "es"
+  - "pl"
+signals:
+  - class: SizeRatioSignal
+  - class: CommonTokensSignal
+  - class: TokenStartSignal
+  - class: DictionaryWordsSignal
+    dictionary:
+      class: CFSDictionary
+      path: 'CFS-dicts'
+      languages:
+        - "en"
+        - "pl"

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export PYTHONPATH=$PYTHONPATH:`cd $(dirname "$0"); pwd`
+
+pylint -d R0921 -d I0011 --rcfile pylint-config -r n att

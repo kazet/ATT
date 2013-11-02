@@ -1,0 +1,3 @@
+from att.classifier.bucket_aggregator import BucketAggregator
+from att.classifier.fast_bucket_average import FastBucketAverage
+from att.classifier.linear_regression import LinearRegression

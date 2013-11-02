@@ -1,0 +1,9 @@
+*.pyc
+*.swp
+cache/
+venv/
+build/
+input_dev/
+models_dev/
+trained_aligners_dev/
+temp/

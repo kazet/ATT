@@ -1,0 +1,10 @@
+lxml
+numpy
+pyyaml
+nltk
+cython
+pylint
+sphinx
+docutils
+jinja2
+pygments
