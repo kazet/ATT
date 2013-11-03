@@ -3,7 +3,9 @@ att
 
 To build the documentation, run the following:
 
-* Install python-virtualenv package
+* Install python-virtualenv and python-pip packages
+
+And execute the following commands:
 * virtualenv venv
 * pip install -r requirements
 * cd att/doc/

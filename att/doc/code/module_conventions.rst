@@ -24,5 +24,5 @@ See :doc:`subclassing_conventions`
 Docstrings
 ----------
 
-Module docstring should link to any documentation related. Use document names
-in the docstrings.
+Module docstring should contain a link to any documentation related. Use
+document names in the docstrings.
