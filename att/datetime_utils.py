@@ -1,9 +1,12 @@
 def TimedeltaInSeconds(timedelta):
+  """Returns the number of seconds in a datetime.timedelta object."""
   return 86400 * timedelta.days + \
          timedelta.seconds + \
          0.000001 * timedelta.microseconds
 
 def SecondsToHuman(seconds):
+  """Converts a number of seconds to human-readable format: number of
+  days, hours, minutes and seconds."""
   seconds = int(seconds)
   result = ""
   if seconds >= 2 * 86400:
