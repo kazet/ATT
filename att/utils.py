@@ -56,7 +56,7 @@ def NumCommonElements(s1, s2):
   s1_iter = 0
   s2_iter = 0
   num_common = 0
-  while s1_iter < len(s1_sorted) and j < len(s2_sorted):
+  while s1_iter < len(s1_sorted) and s2_iter < len(s2_sorted):
     if s1_sorted[s1_iter] < s2_sorted[s2_iter]:
       s1_iter += 1
     elif s1_sorted[s1_iter] > s2_sorted[s2_iter]:
@@ -83,7 +83,7 @@ def EnumeratePairs(lst):
   """Enumerates all pairs in lst, without repeats ((A, B) and (B, A)
   are considered the same) and (A, A) pairs."""
   for first in range(0, len(lst)):
-    for second in range(second + 1, len(lst)):
+    for second in range(first + 1, len(lst)):
       yield (lst[first], lst[second])
 
 
