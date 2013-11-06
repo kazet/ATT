@@ -14,6 +14,7 @@ Contents:
   installation
   testing_aligners
   training_aligners
+  viewing_alignments
   aligners/sentence_similarity_aligner
   aligners/sentence_similarity_aligner_signals
   corpora/corpus_tmx
