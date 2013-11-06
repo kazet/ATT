@@ -12,6 +12,10 @@ Then, run ``render_alignment.py`` with the following options:
 corpus
    The name of the corpus you want to use for evaluation. Remember to use
    different training and testing corpora to avoid overfitting.
+render_reference
+   Use this flag to write a file containing the reference alignment (one
+   should be attached to the corpus you are aligning) next to the alignment
+   file.
 trained_aligner
    The name of the file that contains the trained aligner (written by
    ``train.py``).

@@ -20,6 +20,13 @@ def main():
   parser.add_argument('--output_folder',
                       help="The location of the alignment output.",
                       required=True)
+  parser.add_argument('--render_reference',
+                      action='store_true',
+                      help="If set to True, the reference alignment will be"
+                           " written next to the alignment you are rendering."
+                           " Requires the corpus to have reference"
+                           " alignments available.")
+                      default=False)
   parser.add_argument('--verbose', '-v',
                       action='count',
                       default=0,
@@ -40,13 +47,20 @@ def main():
   LogDebug("[render_alignment.py] aligning and rendering...")
   MkdirIfNotExists(args.output_folder)
   for identifier in corpus.GetMultilingualDocumentIdentifiers():
+    if args.render_reference:
+      reference_alignment = test_corpus.GetMultilingualAlignedDocument(identifier)
+      reference_output_path = os.path.join(
+        args.output_folder,
+        'reference_%s.html' % StripNonFilenameCharacters(identifier))
+      reference_alignment.RenderHTML(identifier, reference_output_path)
+
     output_path = os.path.join(
         args.output_folder,
         'doc_%s.html' % StripNonFilenameCharacters(identifier))
     aligner \
         .Align(corpus.GetMultilingualDocument(identifier)) \
         .RenderHTML(identifier, output_path)
-    CopyDependencies(['common.css', 'alignment_render.css'], args.output_folder)
+  CopyDependencies(['common.css', 'alignment_render.css'], args.output_folder)
 
 if __name__ == "__main__":
     main()
