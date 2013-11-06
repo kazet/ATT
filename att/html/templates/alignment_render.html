@@ -11,7 +11,8 @@
       <thead>
         <tr>
           {% for language in languages %}
-            <th>{{ language }}
+            <th>{{ language }}: sentence number</th>
+            <th>{{ language }}</th>
           {% endfor %}
         </tr>
       </thead>
@@ -22,7 +23,8 @@
           {% else %}
             <tr>
           {% endif %}
-            {% for unused_language, sentence in row %}
+            {% for unused_language, (sentence_id, sentence) in row %}
+              <td>{{ sentence_id }}</td>
               <td>{{ sentence }}</td>
             {% endfor %}
           </tr>

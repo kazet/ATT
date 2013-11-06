@@ -43,8 +43,9 @@ class Alignment(object):
 
   def RenderHTML(self, identifier, output_filename):
     def AddUnmatchedSentences(alignment_data, last_matched_sentences, position):
+      max_skip = 0
       for lang, sentence_id in position:
-        max_skip = sentence_id - last_matched_sentences[lang]
+        max_skip = max(max_skip, sentence_id - last_matched_sentences[lang])
 
       for i in range(1, max_skip):
         unmatched_row = []
@@ -72,21 +73,21 @@ class Alignment(object):
           raise Exception("Non-monotonic alignment printing is not supported")
         last_matched_sentences[lang] = sentence_id
 
-    sentence_ends = [(language, self._multilingual_document.NumSentences(language))
+    sentence_nums = [(language, self._multilingual_document.NumSentences(language))
                      for language in languages]
-    AddUnmatchedSentences(alignment_data, last_matched_sentences, sentence_ends)
-
+    AddUnmatchedSentences(alignment_data, last_matched_sentences, sentence_nums)
+    print sentence_nums
     renderable_alignment_data = []
     for is_matched, row in alignment_data:
       sentences = {}
       for language in languages:
-        sentences[language] = u''
+        sentences[language] = (u'N/A', u'')
       for language, sent_id in row:
         if sent_id < self._multilingual_document.NumSentences(language):
-          sentences[language] = self \
+          sentences[language] = (sent_id, self \
               ._multilingual_document \
               .GetDocument(language) \
-              .GetSentence(sent_id)
+              .GetSentence(sent_id))
       renderable_alignment_data.append(
           ( is_matched,
             sorted(sentences.iteritems())))

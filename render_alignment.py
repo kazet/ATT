@@ -25,7 +25,7 @@ def main():
                       help="If set to True, the reference alignment will be"
                            " written next to the alignment you are rendering."
                            " Requires the corpus to have reference"
-                           " alignments available.")
+                           " alignments available.",
                       default=False)
   parser.add_argument('--verbose', '-v',
                       action='count',
@@ -48,7 +48,7 @@ def main():
   MkdirIfNotExists(args.output_folder)
   for identifier in corpus.GetMultilingualDocumentIdentifiers():
     if args.render_reference:
-      reference_alignment = test_corpus.GetMultilingualAlignedDocument(identifier)
+      reference_alignment = corpus.GetMultilingualAlignedDocument(identifier)
       reference_output_path = os.path.join(
         args.output_folder,
         'reference_%s.html' % StripNonFilenameCharacters(identifier))
