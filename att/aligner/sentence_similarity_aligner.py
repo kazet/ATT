@@ -185,12 +185,34 @@ class SentenceSimilarityAligner(Aligner):
     return decision
 
   def GetSkipProbability(self, skip_length):
-    return math.exp(-0.35 * skip_length)
+    return math.exp(-0.05 * skip_length)
 
   def Align(self, multilingual_document):
     current_positions = {}
     for language in self._languages:
       current_positions[language] = 0
+
+    LogDebug("[SentenceSimilarityAligner] calculating baselines...")
+    # We want not to know the absolute classifier result, but how the
+    # result can be compared to average score of a sentence.
+    # TODO write the normalization so that we don't have to do this
+    sentence_baselines = {}
+    for lang1 in self._languages:
+      for sid1 in range(multilingual_document.NumSentences(lang1)):
+        random_classification_values = []
+        for lang2 in self._languages:
+          if lang2 == lang1:
+            continue
+          for sid2 in range(min(multilingual_document.NumSentences(lang2), 20)):
+            random_classification_values.append(
+                self.GetMatchProbability(
+                    multilingual_document,
+                    lang1,
+                    sid1,
+                    lang2,
+                    sid2))
+        sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
+    LogDebug("[SentenceSimilarityAligner] calculating baselines finished")
 
     alignment = Alignment(multilingual_document)
     while True:
@@ -283,7 +305,8 @@ class SentenceSimilarityAligner(Aligner):
                                    multilingual_document.GetSentence(
                                        grow_language,
                                        current_positions[grow_language] + grow_skip).strip())
-                      if match_probability * best_skip_probability < 0.9:
+                      baseline = sentence_baselines[(language, best_skip)]
+                      if match_probability * best_skip_probability < baseline * 1.1:
                         good = False
                     if good:
                       LogDebugFull("Good! Match add candidate lang=%s sent=%d",
