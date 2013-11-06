@@ -6,9 +6,8 @@ from aligner_factory import AlignerFactory
 from att.alignment import Alignment
 from att.global_context import global_context
 from att.log  import VerboseLevel, LogDebugFull
-from c_signal_aggregator import TuneWeights
-from att.classifier import LinearRegression
-from att.classifier import FastBucketAverage
+from att.classifier.signal_aggregator import TuneWeights
+from att.classifier import LinearRegression, FastBucketAverage
 from att.eta_clock import ETAClock
 from att.utils import EnumeratePairs, Average
 from att.language import Languages
