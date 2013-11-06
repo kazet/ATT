@@ -27,6 +27,7 @@ Contents:
   code/subclassing_conventions
   code/module_conventions
   code/testing
+  code/essential_classes
   languages
 
 Indices and tables
