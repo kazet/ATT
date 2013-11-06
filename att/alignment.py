@@ -1,6 +1,7 @@
 import textwrap
-
+from att.html import RenderTemplate
 from att.log import LogDebug, LogInfo
+
 
 class Alignment(object):
   def __init__(self, multilingual_document, matches=None):
@@ -39,6 +40,63 @@ class Alignment(object):
       result += "\n"
       i += 1
     return result
+
+  def RenderHTML(self, identifier, output_filename):
+    def AddUnmatchedSentences(alignment_data, last_matched_sentences, position):
+      for lang, sentence_id in position:
+        max_skip = sentence_id - last_matched_sentences[lang]
+
+      for i in range(1, max_skip):
+        unmatched_row = []
+        for lang, unused_sentence_id in match:
+          if last_matched_sentences[lang] + i < sentence_id:
+            unmatched_row.append( (lang, last_matched_sentences[lang] + i ) )
+        alignment_data.append( (False, unmatched_row) )
+
+    alignment_data = []
+    last_matched_sentences = {}
+    languages = set()
+    for match in self._matches:
+      for lang, sentence_id in match:
+        languages.add(lang)
+
+    for language in languages:
+      last_matched_sentences[language] = 0
+
+    for match in self._matches:
+      AddUnmatchedSentences(alignment_data, last_matched_sentences, match)
+      alignment_data.append( (True, match) )
+
+      for lang, sentence_id in match:
+        if last_matched_sentences[lang] > sentence_id:
+          raise Exception("Non-monotonic alignment printing is not supported")
+        last_matched_sentences[lang] = sentence_id
+
+    sentence_ends = [(language, self._multilingual_document.NumSentences(language))
+                     for language in languages]
+    AddUnmatchedSentences(alignment_data, last_matched_sentences, sentence_ends)
+
+    renderable_alignment_data = []
+    for is_matched, row in alignment_data:
+      sentences = {}
+      for language in languages:
+        sentences[language] = u''
+      for language, sent_id in row:
+        if sent_id < self._multilingual_document.NumSentences(language):
+          sentences[language] = self \
+              ._multilingual_document \
+              .GetDocument(language) \
+              .GetSentence(sent_id)
+      renderable_alignment_data.append(
+          ( is_matched,
+            sorted(sentences.iteritems())))
+
+    result = RenderTemplate(
+        'alignment_render.html',
+        { 'identifier': identifier,
+          'languages': sorted(list(languages)),
+          'renderable_alignment_data': renderable_alignment_data},
+        output_filename)
 
   def MatchesInNormalForm(self):
     matches = []

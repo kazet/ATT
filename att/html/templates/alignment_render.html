@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="alignment_render.css" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <title>Alignment of {{ identifier }}</title>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+          {% for language in languages %}
+            <th>{{ language }}
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for is_matched, row in renderable_alignment_data %}
+          {% if is_matched %}
+            <tr class="is_matched">
+          {% else %}
+            <tr>
+          {% endif %}
+            {% for unused_language, sentence in row %}
+              <td>{{ sentence }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+  </body>
+</html>

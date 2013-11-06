@@ -1,4 +1,16 @@
 import math
+import re
+import os
+
+def StripNonFilenameCharacters(name):
+  """Strips (replaces with _) all characters that shouldn't exist in a
+  filename."""
+  return re.sub("[^a-zA-Z0-9.,_]", "_", name)
+
+def MkdirIfNotExists(directory):
+  """Creates a directory if it doesn't exists."""
+  if not os.path.exists(directory):
+    os.mkdir(directory)
 
 def First(tup):
   """Return the first element of a tuple or a list. Just for verboseness

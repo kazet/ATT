@@ -1,0 +1,4 @@
+table tr.is_matched td {
+  font-weight: bold;
+  background-color: #dddddd !important;
+}
