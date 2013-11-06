@@ -39,9 +39,10 @@ class DictionaryWordsSignal(Signal):
   def _MemoizedWordTokenizeAndTranslate(self, lang, sentence):
     """Convert a sentence to a list of word translations."""
     if not sentence in self._tokenize_dict:
+      words = word_tokenize(sentence.lower())
       self._tokenize_dict[sentence] = \
-          frozenset(Flatten([self._dictionary.ToEnglish(lang, word)
-                             for word in word_tokenize(sentence.lower())]))
+          frozenset(words + Flatten([self._dictionary.ToEnglish(lang, word)
+                             for word in words]))
     return self._tokenize_dict[sentence]
 
   def ResetCaches(self):
@@ -58,8 +59,8 @@ class DictionaryWordsSignal(Signal):
         word_score_sum += 1.0
       else:
         word_score_sum += 1.0 / math.log(1 + self._word_statistics[word])
-    return word_score_sum
+    return word_score_sum / float(len(sentence1) + len(sentence2))
 
   def _GetAggregator(self):
     """See signal.py"""
-    return FastBucketAverage(0, 0.3, 20)
+    return FastBucketAverage(0, 0.01, 20)
