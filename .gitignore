@@ -1,8 +1,11 @@
 *.pyc
+*.c
+*.so
 *.swp
 cache/
 venv/
 build/
 input_dev/
 trained_aligners_dev/
+rendered_alignments_dev/
 temp/
