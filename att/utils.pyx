@@ -4,26 +4,40 @@ import os
 
 def LongestCommonSubstring(a, b):
   """Returns the longest common substring of A and B."""
+  a_utf8 = a.encode('utf-8')
+  b_utf8 = b.encode('utf-8')
+  cdef char* str1 = a_utf8
+  cdef char* str2 = b_utf8
+  cdef int len1 = len(a_utf8)
+  cdef int len2 = len(b_utf8)
+  cdef int i
+  cdef int j
+  cdef char x
+  cdef char y
+  result = ""
   lengths = [[0 for j in range(len(b)+1)] for i in range(len(a)+1)]
-  for i, x in enumerate(a):
-    for j, y in enumerate(b):
+  for i in range(len1):
+    for j in range(len2):
+      x = str1[i]
+      y = str2[j]
       if x == y:
         lengths[i+1][j+1] = lengths[i][j] + 1
       else:
         lengths[i+1][j+1] = \
             max(lengths[i+1][j], lengths[i][j+1])
   result = ""
-  x, y = len(a), len(b)
-  while x != 0 and y != 0:
-    if lengths[x][y] == lengths[x-1][y]:
-      x -= 1
-    elif lengths[x][y] == lengths[x][y-1]:
-      y -= 1
+  i = len1
+  j = len2
+  while i != 0 and j != 0:
+    if lengths[i][j] == lengths[i-1][j]:
+      i -= 1
+    elif lengths[i][j] == lengths[i][j-1]:
+      j -= 1
     else:
-      assert a[x-1] == b[y-1]
-      result = a[x-1] + result
-      x -= 1
-      y -= 1
+      assert str1[i-1] == str2[j-1]
+      result = a[i-1] + result
+      i -= 1
+      j -= 1
   return result
 
 def StripNonFilenameCharacters(name):
@@ -49,7 +63,7 @@ def Second(tup):
 def GroupByKey(data):
   """Groups the list by its keys. This function will return a list of buckets,
   each of them containing all list elements with the same key."""
-  data.sort(key=lambda (key, unused_value): key)
+  data.sort()
   buckets = []
   last = None
   bucket = []

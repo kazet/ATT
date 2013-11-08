@@ -11,7 +11,7 @@ class LCSSignal(Signal):
   sentences to predict the chance that two sentences will be aligned."""
   def __init__(self, config_dict):
     super(LCSSignal, self).__init__(config_dict)
-    self._max_length = config_dict.get('max_length', 100)
+    self._max_length = config_dict.get('max_length', 50)
 
   def GetSimilarity(self,
                     unused_lang1, sentence1,
@@ -23,4 +23,4 @@ class LCSSignal(Signal):
 
   def _GetAggregator(self):
     """See signal.py"""
-    return FastBucketAverage(0, 0.2, 20)
+    return FastBucketAverage(0.1, 0.4, 20)

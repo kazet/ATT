@@ -13,7 +13,7 @@ class TokenStartSignal(Signal):
   predict the chance that two sentences will be aligned."""
   def __init__(self, config_dict):
     super(TokenStartSignal, self).__init__(config_dict)
-    self._length = config_dict.get('length', 5)
+    self._length = config_dict.get('length', 3)
     self._tokenize_dict = {}
 
   def _MemoizedWordTokenize(self, sentence):

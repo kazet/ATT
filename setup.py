@@ -20,6 +20,7 @@ class DefaultExtension(Extension):
       libraries=libraries)
 
 ext_modules=[
+    DefaultExtension("att.utils"),
     DefaultExtension("att.classifier.signal_aggregator"),
     DefaultExtension("att.classifier.fast_bucket_average"),
 ]
