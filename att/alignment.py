@@ -42,17 +42,18 @@ class Alignment(object):
     return result
 
   def RenderHTML(self, identifier, output_filename):
-    def AddUnmatchedSentences(alignment_data, last_matched_sentences, position):
+    def AddUnmatchedSentences(alignment_data, last_matched_sentences, positions):
       max_skip = 0
-      for lang, sentence_id in position:
+      for lang, sentence_id in positions:
         max_skip = max(max_skip, sentence_id - last_matched_sentences[lang])
 
       for i in range(1, max_skip):
         unmatched_row = []
-        for lang, unused_sentence_id in match:
+        for lang, sentence_id in positions:
           if last_matched_sentences[lang] + i < sentence_id:
             unmatched_row.append( (lang, last_matched_sentences[lang] + i ) )
-        alignment_data.append( (False, unmatched_row) )
+        if len(unmatched_row) > 0:
+          alignment_data.append( (False, unmatched_row) )
 
     alignment_data = []
     last_matched_sentences = {}
@@ -76,7 +77,6 @@ class Alignment(object):
     sentence_nums = [(language, self._multilingual_document.NumSentences(language))
                      for language in languages]
     AddUnmatchedSentences(alignment_data, last_matched_sentences, sentence_nums)
-    print sentence_nums
     renderable_alignment_data = []
     for is_matched, row in alignment_data:
       sentences = {}
