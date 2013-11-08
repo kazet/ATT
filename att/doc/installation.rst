@@ -12,7 +12,7 @@ ATT installation
    global ``site-packages`` directory).
 #. ``pip install -r requirements`` to install all the packages listed in the
    ``requirements`` file in the virtual environment.
-#. ``python setup.py install`` to  compile the C part of the aligner.
+#. ``python setup.py build_ext --inplace`` to  compile the C part of the aligner.
    Later, this command will install the whole ATT package, as soon as I code it.
 #. ``python -m nltk.downloader -d venv/nltk_data all`` to install NLTK data,
    models (such as sentence tokenization models for various languages) and
