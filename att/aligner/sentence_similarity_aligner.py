@@ -192,7 +192,7 @@ class SentenceSimilarityAligner(Aligner):
     for language in self._languages:
       current_positions[language] = 0
 
-    LogDebug("[SentenceSimilarityAligner] calculating baselines...")
+    LogDebugFull("[SentenceSimilarityAligner] calculating baselines...")
     # We want not to know the absolute classifier result, but how the
     # result can be compared to average score of a sentence.
     # TODO write the normalization so that we don't have to do this
@@ -203,7 +203,8 @@ class SentenceSimilarityAligner(Aligner):
         for lang2 in self._languages:
           if lang2 == lang1:
             continue
-          for sid2 in range(min(multilingual_document.NumSentences(lang2), 20)):
+
+          for sid2 in range(min(multilingual_document.NumSentences(lang2), 40)):
             random_classification_values.append(
                 self.GetMatchProbability(
                     multilingual_document,
@@ -212,7 +213,7 @@ class SentenceSimilarityAligner(Aligner):
                     lang2,
                     sid2))
         sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
-    LogDebug("[SentenceSimilarityAligner] calculating baselines finished")
+    LogDebugFull("[SentenceSimilarityAligner] calculating baselines finished")
 
     alignment = Alignment(multilingual_document)
     while True:
@@ -306,7 +307,7 @@ class SentenceSimilarityAligner(Aligner):
                                        grow_language,
                                        current_positions[grow_language] + grow_skip).strip())
                       baseline = sentence_baselines[(language, best_skip)]
-                      if match_probability * best_skip_probability < baseline * 1.1:
+                      if match_probability * best_skip_probability < baseline * 1:
                         good = False
                     if good:
                       LogDebugFull("Good! Match add candidate lang=%s sent=%d",
