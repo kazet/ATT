@@ -1,7 +1,7 @@
 import lxml
 import lxml.html
-import utils
-import flyweights
+from att import flyweights
+from att.utils import Flatten
 
 
 class Document(object):
@@ -42,5 +42,5 @@ class DocumentFactory(object):
     tree = lxml.html.fromstring(html)
     paragraphs = [element.text for element in tree.findall('.//%s' % tag)]
     tokenizer = flyweights.nltk_tokenizer_flyweight_factory.GetOrMake(language.GetNLTKName())
-    sentences = utils.Flatten([tokenizer.tokenize(paragraph) for paragraph in paragraphs])
+    sentences = Flatten([tokenizer.tokenize(paragraph) for paragraph in paragraphs])
     return Document(sentences, language)
