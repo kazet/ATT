@@ -8,9 +8,16 @@ from att.utils import \
   ListSimilarity, \
   EnumeratePairs, \
   Gauss, \
+  LongestCommonSubstring, \
   Flatten
 
 class UtilsTestCase(TestCase):
+  def test_longest_common_substring(self):
+    self.assertEqual(LongestCommonSubstring("", ""), "")
+    self.assertEqual(LongestCommonSubstring("b", "a"), "")
+    self.assertEqual(LongestCommonSubstring("abbaca", "abbaca"), "abbaca")
+    self.assertEqual(LongestCommonSubstring("politechnika", "toaleta"), "olta")
+
   def test_list_similarity(self):
     self.assertAlmostEqual(ListSimilarity([1, 2], [2, 1]), 2.0 / 4.0)
     self.assertAlmostEqual(ListSimilarity([2, 2], [2, 2]), 2.0 / 4.0)

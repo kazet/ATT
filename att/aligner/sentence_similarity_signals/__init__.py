@@ -6,6 +6,8 @@ from att.aligner.sentence_similarity_signals.signal_factory \
   import SignalFactory
 from att.aligner.sentence_similarity_signals.common_tokens_signal \
   import CommonTokensSignal
+from att.aligner.sentence_similarity_signals.lcs_signal \
+  import LCSSignal
 from att.aligner.sentence_similarity_signals.unique_tokens_signal \
   import UniqueTokensSignal
 from att.aligner.sentence_similarity_signals.size_ratio_signal \
