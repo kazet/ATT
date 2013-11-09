@@ -64,11 +64,13 @@ def TuneWeights(inputs,
 
   return (weights, quality)
 
+@cython.cdivision(True)
 @cython.wraparound(False)
 @cython.boundscheck(False)
 cdef CRandFloat(float mi, float ma):
   return mi + (ma - mi) * rand() / float(INT_MAX)
 
+@cython.cdivision(True)
 @cython.wraparound(False)
 @cython.boundscheck(False)
 cdef float* CTuneWeights(
@@ -123,6 +125,7 @@ cdef float* CTuneWeights(
       temp = temp * (1.0 - temp_decrease)
   return weights
 
+@cython.cdivision(True)
 @cython.wraparound(False)
 @cython.boundscheck(False)
 cdef float CEvaluateWeights(
