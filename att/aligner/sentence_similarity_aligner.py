@@ -192,10 +192,8 @@ class SentenceSimilarityAligner(Aligner):
     for language in self._languages:
       current_positions[language] = 0
 
-    LogDebugFull("[SentenceSimilarityAligner] calculating baselines...")
     # We want not to know the absolute classifier result, but how the
     # result can be compared to average score of a sentence.
-    # TODO write the normalization so that we don't have to do this
     sentence_baselines = {}
     for lang1 in self._languages:
       for sid1 in range(multilingual_document.NumSentences(lang1)):
@@ -213,7 +211,6 @@ class SentenceSimilarityAligner(Aligner):
                     lang2,
                     sid2))
         sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
-    LogDebugFull("[SentenceSimilarityAligner] calculating baselines finished")
 
     alignment = Alignment(multilingual_document)
     while True:
@@ -259,18 +256,26 @@ class SentenceSimilarityAligner(Aligner):
                 if match_prob * skip_prob > best_skip_quality:
                   best_skip_quality = match_prob * skip_prob
                   best_skip = skip
-              growset.append( (language, current_positions[language] + best_skip, best_skip) )
+              if best_skip is not None:
+                growset.append( (language,
+                                 current_positions[language] + best_skip,
+                                 best_skip) )
               if len(growset) > 1:
                 LogDebugFull("Growset candidate: %s", str(growset))
                 quality = []
                 for (lang1, sent1, skip1), (lang2, sent2, skip2) in EnumeratePairs(growset):
-                  quality.append(
-                      self.GetMatchProbability(
+                  baseline = \
+                    sentence_baselines[(lang1, sent1)] * \
+                    sentence_baselines[(lang2, sent2)]
+                  match_probability = self.GetMatchProbability(
                           multilingual_document,
                           lang1,
                           sent1,
                           lang2,
-                          sent2) *
+                          sent2)
+                  quality.append(
+                      baseline *
+                      match_probability *
                       self.GetSkipProbability(skip1) *
                       self.GetSkipProbability(skip2))
                 if quality != []:
@@ -306,8 +311,10 @@ class SentenceSimilarityAligner(Aligner):
                                    multilingual_document.GetSentence(
                                        grow_language,
                                        current_positions[grow_language] + grow_skip).strip())
-                      baseline = sentence_baselines[(language, best_skip)]
-                      if match_probability * best_skip_probability < baseline * 1:
+                      baseline = \
+                        sentence_baselines[(language, current_positions[language] + best_skip)] * \
+                        sentence_baselines[(grow_language, current_positions[grow_language] + grow_skip)]
+                      if match_probability * best_skip_probability < baseline * 3.5:
                         good = False
                     if good:
                       LogDebugFull("Good! Match add candidate lang=%s sent=%d",
@@ -325,8 +332,7 @@ class SentenceSimilarityAligner(Aligner):
       match = []
       for lang, sent, skip in best_match_growset:
         match.append( (lang, sent) )
-#        for i in range(0, skip):
-#          alignment.AddMatch([(lang, sent + (1 + i))])
         current_positions[lang] += skip + 1
       alignment.AddMatch(match)
+
     return alignment
