@@ -2,6 +2,57 @@ import math
 import re
 import os
 
+def TupleSplit(string, separator, length):
+  splitted = string.split(separator)
+  if len(splitted) != length:
+    raise ValueError("`%s' should consist of %d values separated with `%s'" % (
+                     string,
+                     length,
+                     separator))
+  else:
+    return tuple(splitted)
+
+def DictUpdateWithString(d, s):
+  """Update a dictionary with a configuration string.
+  Configuration string format:
+  position1=value1;position2=value2;...;positionN=valueN,
+
+  Position format: a dot-separated list of keys. key1.key2.key3
+  will mean d[key1][key2][key3].
+
+  Value format:
+    unicode:value - a unicode string value
+    float:value - a floating-point value"""
+  def ParseValue(string):
+    value_format, value = TupleSplit(string, ":", 2)
+    if value_format == "unicode":
+      return unicode(value)
+    elif value_format == "float":
+      return float(value)
+    elif value_format == "int":
+      return int(value)
+    else:
+      raise ValueError("Unknown format: %s" % value_format)
+
+  if s == '':
+    return d
+
+  updates = s.split(";")
+  for update in updates:
+    key_path, value = TupleSplit(update, "=", 2)
+    if key_path == '':
+      raise KeyError("Empty position")
+    keys = key_path.split(".")
+
+    # find the dictionary to change
+    subdict = d
+    for key in keys[:-1]:
+      if not key in subdict:
+        subdict[key] = {}
+      subdict = subdict[key]
+    subdict[keys[-1]] = ParseValue(value)
+  return d
+
 def LongestCommonSubstring(a, b):
   """Returns the longest common substring of A and B."""
   a_utf8 = a.encode('utf-8')

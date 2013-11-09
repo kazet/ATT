@@ -6,12 +6,60 @@ from att.utils import \
   Average, \
   SetSimilarity, \
   ListSimilarity, \
+  DictUpdateWithString, \
   EnumeratePairs, \
   Gauss, \
   LongestCommonSubstring, \
+  TupleSplit, \
   Flatten
 
 class UtilsTestCase(TestCase):
+  def test_dict_update_with_string(self):
+    updated = DictUpdateWithString({'a': {'b': 2, 'c': 3}, 'd': 4},
+        'a.b=int:4;d=int:5')
+    self.assertEqual(updated, {'a': {'b': 4, 'c': 3}, 'd': 5})
+    updated = DictUpdateWithString({'a': {'b': 2, 'c': 3}, 'd': 4}, 'd=int:5')
+    self.assertEqual(updated, {'a': {'b': 2, 'c': 3}, 'd': 5})
+    updated = DictUpdateWithString({'a': {'b': 2, 'c': 3}, 'd': 4}, '')
+    self.assertEqual(updated, {'a': {'b': 2, 'c': 3}, 'd': 4})
+
+    # test nonexistent formats
+    self.assertRaises(
+        ValueError,
+        DictUpdateWithString,
+        {'a': {'b': 2, 'c': 3}, 'd': 4},
+        'd=xyzzy:4')
+
+    # test empty positions
+    self.assertRaises(
+        KeyError,
+        DictUpdateWithString,
+        {'a': {'b': 2, 'c': 3}, 'd': 4},
+        '=int:4')
+
+    # test adding keys
+    updated = DictUpdateWithString({'a': {'b': 2, 'c': 3}, 'd': 4}, 'e=int:6')
+    self.assertEqual(updated, {'a': {'b': 2, 'c': 3}, 'd': 4, 'e': 6})
+
+    # test adding subkeys
+    updated = DictUpdateWithString({'a': {'b': 2, 'c': 3}, 'd': 4}, 'e.f=int:6')
+    self.assertEqual(updated, {'a': {'b': 2, 'c': 3}, 'd': 4, 'e': {'f': 6} })
+
+    # test if not dict copying happens
+    adict = {'a': {'b': 2, 'c': 3}, 'd': 4}
+    updated = DictUpdateWithString(adict, 'd=int:5')
+    self.assertEqual(updated, {'a': {'b': 2, 'c': 3}, 'd': 5})
+    self.assertEqual(adict, {'a': {'b': 2, 'c': 3}, 'd': 5})
+    # see if they are both the same thing in memory
+    updated['d'] = 6
+    self.assertEqual(adict['d'], 6)
+
+  def test_tuple_split(self):
+    self.assertEqual(TupleSplit("a=b", "=", 2), ("a", "b") )
+    self.assertEqual(TupleSplit("a.b", ".", 2), ("a", "b") )
+    self.assertEqual(TupleSplit("a", ".", 1), ("a",) )
+    self.assertRaises(ValueError, TupleSplit, "a", ".", 2)
+
   def test_longest_common_substring(self):
     self.assertEqual(LongestCommonSubstring("", ""), "")
     self.assertEqual(LongestCommonSubstring("b", "a"), "")
