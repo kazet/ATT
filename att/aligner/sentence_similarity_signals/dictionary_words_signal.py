@@ -59,8 +59,8 @@ class DictionaryWordsSignal(Signal):
         word_score_sum += 1.0
       else:
         word_score_sum += 1.0 / math.log(1 + self._word_statistics[word])
-    return word_score_sum / float(len(sentence1) + len(sentence2))
+    return word_score_sum / float(math.sqrt(len(sentence1) + len(sentence2)))
 
   def _GetAggregator(self):
     """See signal.py"""
-    return FastBucketAverage(0, 0.01, 20)
+    return FastBucketAverage(0.005, 0.5, 20)
