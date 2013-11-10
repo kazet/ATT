@@ -10,6 +10,8 @@ from att.aligner.sentence_similarity_signals.lcs_signal \
   import LCSSignal
 from att.aligner.sentence_similarity_signals.unique_tokens_signal \
   import UniqueTokensSignal
+from att.aligner.sentence_similarity_signals.format_signal \
+  import FormatSignal
 from att.aligner.sentence_similarity_signals.size_ratio_signal \
   import SizeRatioSignal
 from att.aligner.sentence_similarity_signals.token_start_signal \
