@@ -6,7 +6,6 @@ from att.alignment import Alignment
 from att.global_context import global_context
 from att.log  import VerboseLevel, LogDebugFull
 from att.classifier.signal_aggregator import TuneWeights
-from att.classifier import LinearRegression, FastBucketAverage
 from att.eta_clock import ETAClock
 from att.utils import EnumeratePairs, Average
 from att.language import Languages
@@ -133,28 +132,6 @@ class SentenceSimilarityAligner(Aligner):
                        decision,
                        are_aligned,
                        ', '.join(signals_debug)))
-
-  def _TrainSkipLengthsPredictor(self, training_corpus):
-    skip_lengths = {}
-    for identifier in training_corpus.GetMultilingualDocumentIdentifiers():
-      last_matched_positions = {}
-      reference_alignment = \
-        training_corpus.GetMultilingualAlignedDocument(identifier)
-      i = 0
-      for match in reference_alignment.GetMatches():
-        for language, sentence in match:
-          if language in last_matched_positions:
-            skip_length = i - last_matched_positions[language]
-            if not skip_length in skip_lengths:
-              skip_lengths[skip_length] = 0
-            skip_lengths[skip_length] += 1
-          last_matched_positions[language] = i
-        i += 1  # TODO(kazet) what if there is a sentence for every language
-                # that is not aligned with any other? at the same moment?
-    alpha, beta = LinearRegression([(key, math.log(skip_lengths[key]))
-                                    for key in skip_lengths.keys()])
-    self._skip_lengths_predictor_alpha = alpha
-    self._skip_lengths_predictor_beta = beta
 
   def GetMatchProbability(self, multilingual_document, lang1, sid1, lang2, sid2):
     decision = 0
