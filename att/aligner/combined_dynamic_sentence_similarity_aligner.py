@@ -9,7 +9,7 @@ from att.find_union import FindUnion
 class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
   def __init__(self, config):
     super(CombinedDynamicSentenceSimilarityAligner, self).__init__(config)
-    self._min_match_probability = config.get('min_match_probability', 2)
+    self._min_match_probability = config.get('min_match_probability', 0)
 
   def Align(self, multilingual_document):
     sentence_baselines = self._CalculateSentenceBaselines(multilingual_document)

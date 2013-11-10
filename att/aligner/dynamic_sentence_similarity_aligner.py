@@ -47,7 +47,7 @@ def DynamicAlign(lang_a,
       quality_a_skip = GetQuality(dpdata, sent_a - 1, sent_b)
       quality_b_skip = GetQuality(dpdata, sent_a, sent_b - 1)
       quality_match = GetQuality(dpdata, sent_a - 1, sent_b - 1) + \
-                      match_probability / match_baseline
+                      match_probability * match_probability / match_baseline
       if match_probability * match_probability / match_baseline >= min_match_probability and \
           quality_match > quality_b_skip and \
           quality_match > quality_a_skip:
@@ -77,7 +77,7 @@ def DynamicAlign(lang_a,
 class DynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
   def __init__(self, config):
     super(DynamicSentenceSimilarityAligner, self).__init__(config)
-    self._min_match_probability = config.get('min_match_probability', 2)
+    self._min_match_probability = config.get('min_match_probability', 0)
 
   def Align(self, multilingual_document):
     if len(self._languages) != 2:
@@ -100,4 +100,3 @@ class DynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
     for match in reversed(matches):
       alignment.AddMatch(match)
     return alignment
-
