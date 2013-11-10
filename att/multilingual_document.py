@@ -18,6 +18,9 @@ class MultilingualDocument(object):
   def GetSentence(self, language, i):
     return self._document_dict[language].GetSentence(i)
 
+  def GetSentences(self, language):
+    return self._document_dict[language].GetSentences()
+
   def NumSentences(self, language):
     return self._document_dict[language].NumSentences()
 
