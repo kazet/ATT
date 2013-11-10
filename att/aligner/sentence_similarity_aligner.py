@@ -24,7 +24,6 @@ class SentenceSimilarityAligner(Aligner):
   def Train(self, training_corpus):
     self._TrainSignals(training_corpus)
     self._TuneSignalWeights(training_corpus)
-    self._TrainSkipLengthsPredictor(training_corpus)
 
   def _EnumerateTrainingSentencePairs(self, mdoc, alignment):
     for match in alignment.GetMatches():
