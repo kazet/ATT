@@ -13,10 +13,10 @@ class Aligner(object):
     eta_clock = ETAClock(0, len(identifiers), "Evaluating aligner")
     evaluations = []
     for identifier in identifiers:
-      eta_clock.Tick()
       reference_alignment = test_corpus.GetMultilingualAlignedDocument(identifier)
       our_alignment = self.Align(reference_alignment.GetMultilingualDocument())
       evaluations.append(our_alignment.Evaluate(reference_alignment))
+      eta_clock.Tick()
 
     return {'avg_precision': Average([evaluation['precision']
                                       for evaluation in evaluations]),
