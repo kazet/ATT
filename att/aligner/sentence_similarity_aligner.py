@@ -21,6 +21,10 @@ class SentenceSimilarityAligner(Aligner):
         signal_config['runtime'] = config['runtime']
       self._signals.append(SignalFactory.Make(signal_config))
 
+  def _ResetSignalCaches(self):
+    for signal in self._signals:
+      signal.ResetCache()
+
   def Train(self, training_corpus):
     self._TrainSignals(training_corpus)
     self._TuneSignalWeights(training_corpus)

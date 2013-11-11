@@ -12,6 +12,8 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
     self._min_match_probability = config.get('min_match_probability', 0)
 
   def Align(self, multilingual_document):
+    self._ResetSignalCaches()
+
     sentence_baselines = self._CalculateSentenceBaselines(multilingual_document)
     get_match_probability = \
         lambda lang_a, sent_a, lang_b, sent_b: self.GetMatchProbability(

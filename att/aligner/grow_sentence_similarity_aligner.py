@@ -16,6 +16,8 @@ class GrowSentenceSimilarityAligner(SentenceSimilarityAligner):
     return math.exp(-0.05 * skip_length)
 
   def Align(self, multilingual_document):
+    self._ResetSignalCaches()
+
     current_positions = {}
     for language in self._languages:
       current_positions[language] = 0

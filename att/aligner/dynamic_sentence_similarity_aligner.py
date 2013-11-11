@@ -83,6 +83,8 @@ class DynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
     if len(self._languages) != 2:
       raise Exception("DynamicSentenceSimilarityAligner can be used only for"
                       " two languages.")
+    self._ResetSignalCaches()
+
     lang_a = self._languages[0]
     lang_b = self._languages[1]
     sentence_baselines = self._CalculateSentenceBaselines(multilingual_document)
