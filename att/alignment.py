@@ -1,6 +1,6 @@
 import textwrap
 from att.html import RenderTemplate
-from att.log import LogDebug, LogInfo
+from att.log import LogDebug
 
 
 class Alignment(object):
@@ -130,7 +130,7 @@ class Alignment(object):
     else:
       f_measure = 0.0
 
-    LogInfo("Single alignment evaluation: precision=%.3f, recall=%.3f,"
+    LogDebug("Single alignment evaluation: precision=%.3f, recall=%.3f,"
             " f_measure=%.3f, length1=%.3f, length2=%.3f",
             precision,
             recall,

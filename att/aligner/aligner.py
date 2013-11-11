@@ -1,4 +1,5 @@
 from att.utils import Average
+from att.eta_clock import ETAClock
 
 class Aligner(object):
   def Align(self, multilingual_document):
@@ -8,8 +9,11 @@ class Aligner(object):
     pass
 
   def Evaluate(self, test_corpus):
+    identifiers = list(test_corpus.GetMultilingualDocumentIdentifiers())
+    eta_clock = ETAClock(0, len(identifiers), "Evaluating aligner")
     evaluations = []
-    for identifier in test_corpus.GetMultilingualDocumentIdentifiers():
+    for identifier in identifiers:
+      eta_clock.Tick()
       reference_alignment = test_corpus.GetMultilingualAlignedDocument(identifier)
       our_alignment = self.Align(reference_alignment.GetMultilingualDocument())
       evaluations.append(our_alignment.Evaluate(reference_alignment))

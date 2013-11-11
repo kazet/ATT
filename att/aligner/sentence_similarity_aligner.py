@@ -51,7 +51,7 @@ class SentenceSimilarityAligner(Aligner):
       LogDebug("[SentenceSimilarityAligner] Preprocessing %s finished",
                signal.__class__.__name__)
 
-    eta_clock = ETAClock(0, len(identifiers))
+    eta_clock = ETAClock(0, len(identifiers), "Training signals")
     for identifier in identifiers:
       for signal in self._signals:
         signal.ResetCache()
