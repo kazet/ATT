@@ -8,7 +8,13 @@ class Languages(object):
     'en': Language(code='en', name='English', id=1),
     'de': Language(code='de', name='German', id=2),
     'es': Language(code='es', name='Spanish', id=3),
-    'pl': Language(code='pl', name='Polish', id=4)
+    'pt': Language(code='pt', name='Portuguese', id=4),
+    'fr': Language(code='fr', name='French', id=5),
+    'hu': Language(code='hu', name='Hungarian', id=6),
+    'lt': Language(code='lt', name='Lithuanian', id=7),
+    'el': Language(code='el', name='Greek', id=8),
+    'sv': Language(code='sv', name='Swedish', id=9),
+    'pl': Language(code='pl', name='Polish', id=10)
   }
 
   @staticmethod
