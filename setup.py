@@ -1,5 +1,6 @@
 from distutils.core import setup
 from distutils.extension import Extension
+from att.test import RunAll
 from Cython.Distutils import build_ext
 
 default_extra_compile_args=["-O3", "-Wall"]
@@ -26,11 +27,10 @@ ext_modules=[
     DefaultExtension("att.classifier.fast_bucket_average"),
 ]
 
-
-
 setup(
   name = "ATT",
-  cmdclass = {"build_ext": build_ext},
-  ext_modules = ext_modules
+  cmdclass = {"build_ext": build_ext,
+            "test": RunAll},
+  ext_modules=ext_modules
 )
 
