@@ -23,6 +23,7 @@ class DefaultExtension(Extension):
 ext_modules=[
     DefaultExtension("att.utils"),
     DefaultExtension("att.tokenize"),
+    DefaultExtension("att.dictionary.cfs_dictionary"),
     DefaultExtension("att.classifier.signal_aggregator"),
     DefaultExtension("att.classifier.fast_bucket_average"),
 ]
