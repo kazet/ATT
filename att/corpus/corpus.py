@@ -10,4 +10,4 @@ class Corpus(object):
       yield self.GetMultilingualDocument(identifier)
 
   def GetMultilingualAlignedDocument(self, identifier):
-    raise NotImplementedError()
+    raise NotImplementedError("This is not an aligned corpus.")
