@@ -7,7 +7,7 @@ def word_tokenize(sentence):
       last = ""
     elif c != '.' and c != ',':
       last += c
-  if c == " " and last != "":
+  if last != "":
     result.append(last)
     last = ""
   return result
