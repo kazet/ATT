@@ -22,9 +22,9 @@ class DictionaryWordsSignal(Signal):
     self._word_statistics = {}
     self._word_prefix_links = {}
 
-  def ProcessCorpusBeforeTraining(self, unused_languages, training_corpus):
+  def ProcessCorpusBeforeTraining(self, unused_languages, training_corpus, training_set_size):
     """Preprocess a corpus and gather English word frequency statistics."""
-    for identifier in training_corpus.GetMultilingualDocumentIdentifiers():
+    for identifier in training_corpus.GetFirstIdentifiers(training_set_size):
       multilingual_document = training_corpus.GetMultilingualDocument(
           identifier)
       for language in multilingual_document.GetLanguages():

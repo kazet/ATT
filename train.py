@@ -15,6 +15,12 @@ def main():
   parser.add_argument('--aligner',
                       help="The aligner configuration location.",
                       required=True)
+  parser.add_argument('--training_set_size',
+                      help="The number of documents that will be taken from"
+                           " the corpus to train the aligner.",
+                      default=500,
+                      type=int,
+                      required=True)
   parser.add_argument('--output',
                       help="The file trained aligner should be written to.",
                       required=True)
@@ -31,10 +37,10 @@ def main():
 
   current_directory = os.path.dirname(__file__)
   nltk.data.path.append(os.path.join(current_directory, "venv/nltk_data"))
-
+  print args.training_set_size
   training_corpus = CorpusFactory.MakeFromFile(args.training_corpus)
   aligner = AlignerFactory.MakeFromFile(args.aligner)
-  aligner.Train(training_corpus)
+  aligner.Train(training_corpus, args.training_set_size)
 
   SaveToFile(aligner, args.output)
 

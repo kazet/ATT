@@ -5,7 +5,7 @@ class Aligner(object):
   def Align(self, multilingual_document):
     raise NotImplementedError()
 
-  def Train(self, training_corpus):
+  def Train(self, training_corpus, training_set_size):
     pass
 
   def Evaluate(self, test_corpus):

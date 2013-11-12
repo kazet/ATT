@@ -25,9 +25,9 @@ class SentenceSimilarityAligner(Aligner):
     for signal in self._signals:
       signal.ResetCache()
 
-  def Train(self, training_corpus):
-    self._TrainSignals(training_corpus)
-    self._TuneSignalWeights(training_corpus)
+  def Train(self, training_corpus, training_set_size):
+    self._TrainSignals(training_corpus, training_set_size)
+    self._TuneSignalWeights(training_corpus, training_set_size)
 
   def _EnumerateTrainingSentencePairs(self, mdoc, alignment):
     for match in alignment.GetMatches():
@@ -41,9 +41,8 @@ class SentenceSimilarityAligner(Aligner):
             are_aligned = 1
           yield ((lang1, sid1), (lang2, i), are_aligned)
 
-  def _TrainSignals(self, training_corpus):
-    identifiers = \
-        list(training_corpus.GetMultilingualDocumentIdentifiers())
+  def _TrainSignals(self, training_corpus, training_set_size):
+    identifiers = training_corpus.GetFirstIdentifiers(training_set_size)
     i = 0
 
     # some signal might want to gather some statistical information
@@ -51,7 +50,7 @@ class SentenceSimilarityAligner(Aligner):
     for signal in self._signals:
       LogDebug("[SentenceSimilarityAligner] Preprocessing %s",
                signal.__class__.__name__)
-      signal.ProcessCorpusBeforeTraining(self._languages, training_corpus)
+      signal.ProcessCorpusBeforeTraining(self._languages, training_corpus, training_set_size)
       LogDebug("[SentenceSimilarityAligner] Preprocessing %s finished",
                signal.__class__.__name__)
 
@@ -75,11 +74,11 @@ class SentenceSimilarityAligner(Aligner):
     for signal in self._signals:
       signal.LogStateDebug()
 
-  def _TuneSignalWeights(self, training_corpus):
+  def _TuneSignalWeights(self, training_corpus, training_set_size):
     LogDebug("[SentenceSimilarityAligner] signals: %s",
              ', '.join([signal.__class__.__name__ for signal in self._signals]))
     tuning_inputs = []
-    for identifier in training_corpus.GetMultilingualDocumentIdentifiers():
+    for identifier in training_corpus.GetFirstIdentifiers(training_set_size):
       reference_alignment = \
         training_corpus.GetMultilingualAlignedDocument(identifier)
       mdoc = reference_alignment.GetMultilingualDocument()

@@ -57,7 +57,8 @@ class Signal(object):
 
   def ProcessCorpusBeforeTraining(self,
                                   unused_languages,
-                                  unused_training_corpus):
+                                  unused_training_corpus,
+                                  unused_training_set_size):
     """Any preprocessing (i.e. word statistics) the signal may want to
     perform."""
     pass

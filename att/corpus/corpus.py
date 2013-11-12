@@ -5,6 +5,9 @@ class Corpus(object):
   def GetMultilingualDocumentIdentifiers(self):
     raise NotImplementedError()
 
+  def GetFirstIdentifiers(self, num):
+    return list(self.GetMultilingualDocumentIdentifiers())[:num]
+
   def GetMultilingualDocuments(self):
     for identifier in self.GetMultilingualDocumentIdentifiers():
       yield self.GetMultilingualDocument(identifier)
