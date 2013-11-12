@@ -18,9 +18,10 @@ def main():
   parser.add_argument('--verbose', '-v',
                       action='count',
                       default=0,
-                      help="Determines verbosity level (-v, -vv or -vvv):"
-                           " 0 - prints errors/warnings (default),"
-                           " 1 - prints information, 2 - prints everything.")
+                      help="Determines verbosity level (none, -v, -vv or"
+                           " -vvv). none: prints errors/warnings (default),"
+                           " -v - prints basic information, -vv: prints debug"
+                           " data, -vvv: prints everything.")
 
   args = parser.parse_args(sys.argv[1:])
   global_context.SetArgs(args)
