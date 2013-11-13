@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 import sys
 import nltk
@@ -19,8 +21,7 @@ def main():
                       help="The number of documents that will be taken from"
                            " the corpus to train the aligner.",
                       default=500,
-                      type=int,
-                      required=True)
+                      type=int)
   parser.add_argument('--output',
                       help="The file trained aligner should be written to.",
                       required=True)
