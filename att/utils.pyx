@@ -2,6 +2,20 @@ import math
 import re
 import os
 
+def HasExtension(filename, required_extension):
+  unused_name, extension = os.path.splitext(filename)
+  return extension == required_extension
+
+def RecursiveListing(d):
+  listing = []
+  for f in os.listdir(d):
+    fp = os.path.join(d, f)
+    if os.path.isdir(fp):
+      listing.extend(RecursiveListing(fp))
+    else:
+      listing.append(fp)
+  return listing
+
 def TupleSplit(string, separator, length):
   splitted = string.split(separator)
   if len(splitted) != length:

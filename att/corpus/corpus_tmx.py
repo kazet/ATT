@@ -7,6 +7,7 @@ from att.document import Document
 from att.alignment import Alignment
 from att.multilingual_document import MultilingualDocument
 from att.language import Languages
+from att.utils import RecursiveListing, HasExtension
 from corpus_factory import CorpusFactory
 
 @CorpusFactory.Register
@@ -21,15 +22,16 @@ class CorpusTMX(Corpus):
     LogDebug("[CorpusTMX] languages: %s",
              ', '.join(map(str, self._languages)))
     self._config_dir = config.get('runtime', {}).get('config_dir', '')
-    self._identifiers_file = os.path.join(self._config_dir,
-                                          config['identifiers_file'])
     self._data_location = os.path.join(self._config_dir,
                                        config['data_location'])
+    self._identifiers = [
+        filename
+        for filename in RecursiveListing(self._data_location)
+        if HasExtension(filename, '.tmx')]
     LogDebug("[CorpusTMX] initialization finished")
 
   def GetMultilingualDocumentIdentifiers(self):
-    for line in open(self._identifiers_file):
-      yield line.strip()
+    return self._identifiers
 
   def GetMultilingualDocument(self, identifier):
     return self \
@@ -37,9 +39,7 @@ class CorpusTMX(Corpus):
         .GetMultilingualDocument()
 
   def GetMultilingualAlignedDocument(self, identifier):
-    data = '' \
-      .join(open(os.path.join(self._data_location, '%s' % identifier)) \
-      .readlines())
+    data = ''.join(open(identifier).readlines())
 
     documents = dict([(lang, Document([], lang)) for lang in self._languages])
 

@@ -1,8 +1,11 @@
 import math
+import os
 
 from att.test import TestCase
 from att.utils import \
   GroupByKey, \
+  HasExtension, \
+  RecursiveListing, \
   Average, \
   SetSimilarity, \
   ListSimilarity, \
@@ -14,6 +17,24 @@ from att.utils import \
   Flatten
 
 class UtilsTestCase(TestCase):
+  def test_has_extension(self):
+    self.assertTrue(HasExtension("/a/b/c.d", ".d"))
+    self.assertFalse(HasExtension("/a/b/c.d", ".e"))
+    self.assertTrue(HasExtension("c.d.efg", ".efg"))
+    self.assertFalse(HasExtension("c.d.efg.fgh", ".efg"))
+
+  def test_recursive_listing(self):
+    test_dir = os.path.join(
+        os.path.dirname(__file__),
+        'fixtures/test_utils/test_recursive_listing/')
+    listing = RecursiveListing(test_dir)
+    self.assertUnorderedEqual(listing,
+      [test_dir + 'dir1/dir2/file1',
+       test_dir + 'dir1/file2',
+       test_dir + 'file3',
+       test_dir + 'file4',
+       test_dir + 'file5'])
+
   def test_dict_update_with_string(self):
     updated = DictUpdateWithString({'a': {'b': 2, 'c': 3}, 'd': 4},
         'a.b=int:4;d=int:5')
