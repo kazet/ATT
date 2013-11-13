@@ -10,11 +10,7 @@ ATT installation
 #. ``virtualenv venv`` to create a virtual Python environment where installed
    packages will be stored (so that you can update them independelntly from the
    global ``site-packages`` directory).
-#. ``pip install -r requirements`` to install all the packages listed in the
-   ``requirements`` file in the virtual environment.
-#. ``python setup.py build_ext --inplace`` to  compile the C part of the aligner.
-   Later, this command will install the whole ATT package, as soon as I code it.
-#. ``python -m nltk.downloader -d venv/nltk_data all`` to install NLTK data,
-   models (such as sentence tokenization models for various languages) and
-   corpora.
+#. ``python setup.py install`` to install all required packages and ATT.
 
+After that, ``train.py``, ``test_aligner.py`` and ``render_alignment.py`` will
+be available in your virtualenv.

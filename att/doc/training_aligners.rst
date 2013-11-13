@@ -13,16 +13,69 @@ First, run ``. venv/bin/activate`` to enter the Python virtual environment
 
 Then, run ``train.py`` with the following options:
 
-training_corpus
+--training_corpus
    The name of the corpus you want to use for training. Remember to use
    different training and testing corpora to avoid overfitting.
-output
+--output
    The name of the file training aligner will be written to.
-aligner
+--aligner
    The aligner you want to train. Currently no safety checks are performed
    to check, if the tested aligner matches the model you provide him, so be
    careful: it will fail silently or just produce weird results.
-v
+--v
    Verbose level (use -v to see some information messages, -vv to see
    debug messages and -vvv to see everything - the last option is slow
    and should not be used if you're not debugging the program).
+
+Example
+-------
+
+Suppose you want to train the best aligner we have,
+``CombinedDynamicSentenceSimilarityAligner``
+(:doc:`/aligners/CombinedDynamicSentenceSimilarityAligner`) on the DGT TM
+corpus to align English, French and Polish.
+
+Step 0: follow :doc:`/installation`.
+
+First, download any subset of the files listed in
+http://open-data.europa.eu/en/data/dataset/dgt-translation-memory ,
+unzip them and configure the corpus by putting the following in
+``aligner.yml``:
+
+.. code-block:: yaml
+  :linenos:
+
+  class: CorpusTMX
+  languages:
+    - "en"
+    - "pl"
+    - "fr"
+  data_location: "unziped_dgt_memory_location/"
+
+Then, configure the aligner, by creating ``aligner.yml``:
+
+.. code-block:: yaml
+  :linenos:
+
+  class: CombinedDynamicSentenceSimilarityAligner
+  languages:
+  - "en"
+  - "fr"
+  - "pl"
+  signals:
+   - class: SizeRatioSignal
+   - class: CommonTokensSignal
+   - class: TokenStartSignal
+   - class: UniqueTokensSignal
+   - class: DictionaryWordsSignal
+     dictionary:
+      class: CFSDictionary
+      path: 'CFS-dicts'
+      languages:
+      - "en"
+      - "fr"
+      - "pl"
+
+Then, run:
+
+``python train.py --training_corpus corpus.yml --output trained_aligner --aligner aligner.yml -vv``
