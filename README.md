@@ -6,7 +6,8 @@ Building documentation
 
 To build the documentation, run the following:
 
-* Install python-virtualenv and python-pip packages
+* Install the following packages: `python-virtualenv`, `libxml2-dev`,
+  `libxslt-dev`, `python-pip` and `python-dev`.
 
 And execute the following commands:
 * cd att/
