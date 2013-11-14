@@ -24,3 +24,9 @@ Training aligners
 Suggested aligner to use is CombinedDynamicSentenceSimilarityAligner.
 To train it, follow the instructions in
 `att/doc/_build/training_aligners.html`
+
+Testing aligners
+----------------
+
+To test an aligner, follow the instructions in
+`att/doc/_build/testing_aligners.html`

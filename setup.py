@@ -1,9 +1,7 @@
 from setuptools import setup
-from att.test import RunAll
 
 setup(
   name="ATT",
-  cmdclass={"test": RunAll},
   package_data = {
     'att/html': [
         'dependencies/*',
