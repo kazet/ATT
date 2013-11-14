@@ -22,6 +22,9 @@ Then, run ``train.py`` with the following options:
    The aligner you want to train. Currently no safety checks are performed
    to check, if the tested aligner matches the model you provide him, so be
    careful: it will fail silently or just produce weird results.
+--training_set_size
+  The number of documents that will be taken from the corpus to train the
+  aligner. For more (>5) languages, 100 is enough.
 --v
    Verbose level (use -v to see some information messages, -vv to see
    debug messages and -vvv to see everything - the last option is slow
