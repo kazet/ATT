@@ -31,7 +31,6 @@ setup(
     'att/classifier'],
   install_requires = [
     'lxml',
-    'numpy',
     'pyyaml',
     'nltk',
     'cython',
