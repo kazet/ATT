@@ -6,6 +6,15 @@ def HasExtension(filename, required_extension):
   unused_name, extension = os.path.splitext(filename)
   return extension == required_extension
 
+def DictInc(d, position):
+  if not position in d:
+    d[position] = 0
+  d[position] += 1
+
+def DictIncMultiple(d, positions):
+  for position in positions:
+    DictInc(d, position)
+
 def RecursiveListing(d):
   listing = []
   for f in os.listdir(d):

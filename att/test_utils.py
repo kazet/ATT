@@ -14,9 +14,28 @@ from att.utils import \
   Gauss, \
   LongestCommonSubstring, \
   TupleSplit, \
+  DictInc, \
+  DictIncMultiple, \
   Flatten
 
 class UtilsTestCase(TestCase):
+  def test_dict_inc(self):
+    d = {'c': 0}
+    DictInc(d, 'a')
+    DictInc(d, 'b')
+    DictInc(d, 'b')
+    DictInc(d, 'c')
+    DictInc(d, 'c')
+    DictInc(d, 'c')
+    self.assertEqual(d, {'a': 1, 'b': 2, 'c': 3})
+
+  def test_dict_inc_multiple(self):
+    d = {'c': 0}
+    DictIncMultiple(d, ['a', 'b', 'c'])
+    DictIncMultiple(d, set(['b', 'c']))
+    DictIncMultiple(d, set(['c']))
+    self.assertEqual(d, {'a': 1, 'b': 2, 'c': 3})
+
   def test_has_extension(self):
     self.assertTrue(HasExtension("/a/b/c.d", ".d"))
     self.assertFalse(HasExtension("/a/b/c.d", ".e"))
