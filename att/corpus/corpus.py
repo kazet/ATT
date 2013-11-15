@@ -1,4 +1,7 @@
 class Corpus(object):
+  def GetLanguages(self):
+    return self._languages
+
   def GetMultilingualDocument(self, identifier):
     raise NotImplementedError()
 
@@ -11,6 +14,10 @@ class Corpus(object):
   def GetMultilingualDocuments(self):
     for identifier in self.GetMultilingualDocumentIdentifiers():
       yield self.GetMultilingualDocument(identifier)
+
+  def GetMultilingualAlignedDocuments(self):
+    for identifier in self.GetMultilingualDocumentIdentifiers():
+      yield self.GetMultilingualAlignedDocument(identifier)
 
   def GetMultilingualAlignedDocument(self, identifier):
     raise NotImplementedError("This is not an aligned corpus.")

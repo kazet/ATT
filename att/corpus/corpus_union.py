@@ -12,6 +12,10 @@ class CorpusUnion(Corpus):
         corpus['runtime'] = config['runtime']
     self._corpora = [CorpusFactory.Make(corpus)
                      for corpus in config['corpora']]
+    self._languages = self._corpora[0].GetLanguages()
+    for corpus in self._corpora:
+      if set(corpus.GetLanguages()) != set(self._languages):
+        raise Exception("Language sets of all corpora in CorpusUnion should be the same")
     corpora_names = [corpus.__class__.__name__ for corpus in self._corpora]
 
   def GetMultilingualDocumentIdentifiers(self):

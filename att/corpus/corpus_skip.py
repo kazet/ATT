@@ -11,6 +11,7 @@ class CorpusSkip(Corpus):
       config['corpus']['runtime'] = config['runtime']
 
     self._corpus = CorpusFactory.Make(config['corpus'])
+    self._languages = self._corpus.GetLanguages()
     self._n = config['n']
 
   def GetMultilingualDocumentIdentifiers(self):

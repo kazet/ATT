@@ -43,6 +43,7 @@ setup(
   scripts = [
     'train.py',
     'test_aligner.py',
+    'make_dictionary.py',
     'render_alignment.py']
 )
 
