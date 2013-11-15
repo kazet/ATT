@@ -39,6 +39,7 @@ setup(
     'docutils',
     'jinja2',
     'pygments',
+    'unidecode',
     'unittest2'],
   scripts = [
     'train.py',
