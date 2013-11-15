@@ -10,6 +10,7 @@ class MockCorpus(Corpus):
       # we want to preserve order
       self._identifiers.append(mdoc['identifier'])
       mdocs.append( (mdoc['identifier'], mdoc['multilingual_document']) )
+    self._languages = config.get('languages', [])
     self._mdoc_dict = dict(mdocs)
 
   def GetMultilingualDocument(self, identifier):
