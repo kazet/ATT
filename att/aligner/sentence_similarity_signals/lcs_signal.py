@@ -1,5 +1,7 @@
 """See `SentenceSimilarityAligner: available signals' in the documentation."""
 
+from unidecode import unidecode
+
 from att.classifier import FastBucketAverage
 from att.utils import LongestCommonSubstring
 from att.aligner.sentence_similarity_signals.signal import Signal
@@ -17,8 +19,8 @@ class LCSSignal(Signal):
                     unused_lang1, sentence1,
                     unused_lang2, sentence2):
     """Compute the signal value."""
-    prefix1 = sentence1[:self._max_length]
-    prefix2 = sentence2[:self._max_length]
+    prefix1 = unidecode(sentence1[:self._max_length])
+    prefix2 = unidecode(sentence2[:self._max_length])
     return len(LongestCommonSubstring(prefix1, prefix2)) / float(len(prefix1) + len(prefix2))
 
   def _GetAggregator(self):
