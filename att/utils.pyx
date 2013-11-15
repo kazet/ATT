@@ -80,7 +80,7 @@ def LongestCommonSubstring(a, b):
   cdef char x
   cdef char y
   result = ""
-  lengths = [[0 for j in range(len(b)+1)] for i in range(len(a)+1)]
+  lengths = [[0 for j in range(len(b_utf8)+1)] for i in range(len(a_utf8)+1)]
   for i in range(len1):
     for j in range(len2):
       x = str1[i]
