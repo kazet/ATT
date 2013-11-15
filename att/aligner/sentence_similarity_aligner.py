@@ -97,6 +97,10 @@ class SentenceSimilarityAligner(Aligner):
     self._weights, quality = TuneWeights(tuning_inputs)
     LogDebug("[SentenceSimilarityAligner] Sentence match classifier accuracy: %.2f%%",
              quality * 100.0)
+    LogDebug("[SentenceSimilarityAligner] Sentence match signal weights:\n%s",
+             '\n'.join([
+                '\t%s: %.3f' % (signal.__class__.__name__, weight)
+                for signal, weight in zip(self._signals, self._weights)]))
     if global_context.GetArgs().verbose > VerboseLevel.DEBUG_FULL:
       for identifier in training_corpus.GetMultilingualDocumentIdentifiers():
         reference_alignment = \
