@@ -14,7 +14,8 @@ class Languages(object):
     'lt': Language(code='lt', name='Lithuanian', id=7),
     'el': Language(code='el', name='Greek', id=8),
     'sv': Language(code='sv', name='Swedish', id=9),
-    'pl': Language(code='pl', name='Polish', id=10)
+    'pl': Language(code='pl', name='Polish', id=10),
+    'cz': Language(code='cz', name='Czech', id=11)
   }
 
   @staticmethod
