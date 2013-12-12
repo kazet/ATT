@@ -32,7 +32,11 @@ class UniqueTokensSignal(Signal):
     """Reset the internal per-sentence cache."""
     self._tokenize_dict = {}
 
-  def GetSimilarity(self, lang1, sentence1, lang2, sentence2):
+  def GetSimilarity(
+      self,
+      lang1, sentence1,
+      lang2, sentence2,
+      unused_dictionary):
     """Compute the signal value."""
     words1 = self._MemoizedWordTokenizeAndFilter(lang1, sentence1)
     words2 = self._MemoizedWordTokenizeAndFilter(lang2, sentence2)

@@ -10,17 +10,24 @@ class Signal(object):
     self._aggregators = {}
     self._global_aggregator = self._GetAggregator()
 
-  def AddTrainingRecord(self, lang1, sent1, lang2, sent2, are_aligned):
+  def AddTrainingRecord(
+      self,
+      lang1,
+      sent1,
+      lang2,
+      sent2,
+      are_aligned,
+      dictionary):
     """Add one training record (two sentences in two different languages
     plus an information if the sentences should be aligned or not)
     to any models the signal has."""
     if not (lang1, lang2) in self._aggregators:
       self._aggregators[(lang1, lang2)] = self._GetAggregator()
     self._aggregators[(lang1, lang2)].Aggregate(
-        self.GetSimilarity(lang1, sent1, lang2, sent2),
+        self.GetSimilarity(lang1, sent1, lang2, sent2, dictionary),
         are_aligned)
     self._global_aggregator.Aggregate(
-        self.GetSimilarity(lang1, sent1, lang2, sent2),
+        self.GetSimilarity(lang1, sent1, lang2, sent2, dictionary),
         are_aligned)
 
   def LogStateDebug(self):
@@ -34,11 +41,15 @@ class Signal(object):
              ','.join([str(k) + ': '+ str(v.MinBucketSize())
                        for k, v in self._aggregators.items()]))
 
-  def GetAggregatedMatchProbability(self, lang1, sent1, lang2, sent2):
+  def GetAggregatedMatchProbability(
+      self,
+      lang1, sent1,
+      lang2, sent2,
+      dictionary):
     """Return how big is the probability that two sentences would be aligned,
     if we would look only at the value of this signal. The trained model will
     be used to figure the probability out."""
-    similarity = self.GetSimilarity(lang1, sent1, lang2, sent2)
+    similarity = self.GetSimilarity(lang1, sent1, lang2, sent2, dictionary)
     if not (lang1, lang2) in self._aggregators:
       return self._global_aggregator.Get(similarity)
 
@@ -58,14 +69,16 @@ class Signal(object):
   def ProcessCorpusBeforeTraining(self,
                                   unused_languages,
                                   unused_training_corpus,
-                                  unused_training_set_size):
+                                  unused_training_set_size,
+                                  unused_dictionary):
     """Any preprocessing (i.e. word statistics) the signal may want to
     perform."""
     pass
 
   def GetSimilarity(self,
                     unused_lang1, unused_sent1,
-                    unused_lang2, unused_sent2):
+                    unused_lang2, unused_sent2,
+                    unused_dictionary):
     """Abstract method: compute similarity between two sentences in two
     different languages."""
     raise NotImplementedError()

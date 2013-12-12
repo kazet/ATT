@@ -12,7 +12,8 @@ class RandomSignal(Signal):
   aligned. For testing purposes."""
   def GetSimilarity(self,
                     unused_lang1, unused_sentence1,
-                    unused_lang2, unused_sentence2):
+                    unused_lang2, unused_sentence2,
+                    unused_dictionary):
     return random.uniform(-1, 1)
 
   def _GetAggregator(self):

@@ -15,7 +15,13 @@ class PunctuationSignal(Signal):
         config_dict.get('characters',
                         ['.', ',', ':', ';', '(', ')', '[', ']', '?'])
 
-  def GetSimilarity(self, unused_lang1, sentence1, unused_lang2, sentence2):
+  def GetSimilarity(
+      self,
+      unused_lang1,
+      sentence1,
+      unused_lang2,
+      sentence2,
+      unused_dictionary):
     """Compute the signal value."""
     counters1 = dict([(character, 0) for character in self._characters])
     counters2 = dict([(character, 0) for character in self._characters])

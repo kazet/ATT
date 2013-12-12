@@ -24,7 +24,13 @@ class FormatSignal(Signal):
 
     return i > len(sentence) * self._all_caps_threshold
 
-  def GetSimilarity(self, unused_lang1, sentence1, unused_lang2, sentence2):
+  def GetSimilarity(
+      self,
+      unused_lang1,
+      sentence1,
+      unused_lang2,
+      sentence2,
+      unused_dictionary):
     """Compute the signal value."""
     c1 = self.IsAllCapital(sentence1)
     c2 = self.IsAllCapital(sentence2)

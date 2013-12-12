@@ -34,7 +34,8 @@ class TokenStartSignal(Signal):
 
   def GetSimilarity(self,
                     unused_lang1, sentence1,
-                    unused_lang2, sentence2):
+                    unused_lang2, sentence2,
+                    unused_dictionary):
     """Compute the signal value."""
     words1 = self._MemoizedWordTokenize(sentence1)
     words2 = self._MemoizedWordTokenize(sentence2)

@@ -17,7 +17,8 @@ class LCSSignal(Signal):
 
   def GetSimilarity(self,
                     unused_lang1, sentence1,
-                    unused_lang2, sentence2):
+                    unused_lang2, sentence2,
+                    unused_dictionary):
     """Compute the signal value."""
     prefix1 = unidecode(sentence1[:self._max_length])
     prefix2 = unidecode(sentence2[:self._max_length])

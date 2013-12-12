@@ -2,9 +2,9 @@
 
 import math
 
+from att.counter import ProbabilisticCounter
 from att.classifier import FastBucketAverage
 from att.utils import Flatten
-from att.dictionary import DictionaryFactory
 from att.tokenize import word_tokenize
 from att.aligner.sentence_similarity_signals.signal import Signal
 from att.aligner.sentence_similarity_signals.signal_factory import SignalFactory
@@ -15,14 +15,15 @@ class DictionaryWordsSignal(Signal):
   in each one."""
   def __init__(self, config):
     super(DictionaryWordsSignal, self).__init__(config)
-    if 'runtime' in config:
-      config['dictionary']['runtime'] = config['runtime']
-    self._dictionary = DictionaryFactory.Make(config['dictionary'])
     self._tokenize_dict = {}
     self._word_statistics = {}
-    self._word_prefix_links = {}
 
-  def ProcessCorpusBeforeTraining(self, unused_languages, training_corpus, training_set_size):
+  def ProcessCorpusBeforeTraining(
+      self,
+      unused_languages,
+      training_corpus,
+      training_set_size,
+      dictionary):
     """Preprocess a corpus and gather English word frequency statistics."""
     for identifier in training_corpus.GetFirstIdentifiers(training_set_size):
       multilingual_document = training_corpus.GetMultilingualDocument(
@@ -31,17 +32,17 @@ class DictionaryWordsSignal(Signal):
         document = multilingual_document.GetDocument(language)
         for sentence in document.GetSentences():
           for foreign_word in word_tokenize(sentence.lower()):
-            for word in self._dictionary.ToEnglish(language, foreign_word):
+            for word in dictionary.ToEnglish(language, foreign_word):
               if not word in self._word_statistics:
                 self._word_statistics[word] = 0
               self._word_statistics[word] += 1
 
-  def _MemoizedWordTokenizeAndTranslate(self, lang, sentence):
+  def _MemoizedWordTokenizeAndTranslate(self, lang, sentence, dictionary):
     """Convert a sentence to a list of word translations."""
     if not sentence in self._tokenize_dict:
       words = word_tokenize(sentence.lower())
       self._tokenize_dict[sentence] = \
-          frozenset(words + Flatten([self._dictionary.ToEnglish(lang, word)
+          frozenset(words + Flatten([dictionary.ToEnglish(lang, word)
                              for word in words]))
     return self._tokenize_dict[sentence]
 
@@ -49,10 +50,12 @@ class DictionaryWordsSignal(Signal):
     """Reset the internal per-sentence cache."""
     self._tokenize_dict = {}
 
-  def GetSimilarity(self, lang1, sentence1, lang2, sentence2):
+  def GetSimilarity(self, lang1, sentence1, lang2, sentence2, dictionary):
     """Compute the signal value."""
-    words1 = self._MemoizedWordTokenizeAndTranslate(lang1, sentence1)
-    words2 = self._MemoizedWordTokenizeAndTranslate(lang2, sentence2)
+    words1 = self._MemoizedWordTokenizeAndTranslate(
+        lang1, sentence1, dictionary)
+    words2 = self._MemoizedWordTokenizeAndTranslate(
+        lang2, sentence2, dictionary)
     word_score_sum = 0
     for word in words1 & words2:
       if not word in self._word_statistics:

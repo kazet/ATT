@@ -3,31 +3,33 @@ import math
 from aligner import Aligner
 from sentence_similarity_signals import SignalFactory
 from att.alignment import Alignment
-from att.global_context import global_context
-from att.log  import VerboseLevel, LogDebugFull
 from att.classifier.signal_aggregator import TuneWeights
+from att.dictionary import DictionaryFactory
 from att.eta_clock import ETAClock
-from att.utils import EnumeratePairs, Average
+from att.global_context import global_context
 from att.language import Languages
-from att.log import LogDebug
+from att.log import LogDebug, VerboseLevel, LogDebugFull
+from att.utils import EnumeratePairs, Average
 
 class SentenceSimilarityAligner(Aligner):
   def __init__(self, config):
     self._languages = [Languages.GetByCode(code)
                        for code in config['languages']]
+
     self._signals = []
     for signal_config in config['signals']:
       if 'runtime' in config:
         signal_config['runtime'] = config['runtime']
+
       self._signals.append(SignalFactory.Make(signal_config))
 
   def _ResetSignalCaches(self):
     for signal in self._signals:
       signal.ResetCache()
 
-  def Train(self, training_corpus, training_set_size):
-    self._TrainSignals(training_corpus, training_set_size)
-    self._TuneSignalWeights(training_corpus, training_set_size)
+  def Train(self, training_corpus, training_set_size, dictionary):
+    self._TrainSignals(training_corpus, training_set_size, dictionary)
+    self._TuneSignalWeights(training_corpus, training_set_size, dictionary)
 
   def _EnumerateTrainingSentencePairs(self, mdoc, alignment):
     for match in alignment.GetMatches():
@@ -41,7 +43,7 @@ class SentenceSimilarityAligner(Aligner):
             are_aligned = 1
           yield ((lang1, sid1), (lang2, i), are_aligned)
 
-  def _TrainSignals(self, training_corpus, training_set_size):
+  def _TrainSignals(self, training_corpus, training_set_size, dictionary):
     identifiers = training_corpus.GetFirstIdentifiers(training_set_size)
     i = 0
 
@@ -50,7 +52,11 @@ class SentenceSimilarityAligner(Aligner):
     for signal in self._signals:
       LogDebug("[SentenceSimilarityAligner] Preprocessing %s",
                signal.__class__.__name__)
-      signal.ProcessCorpusBeforeTraining(self._languages, training_corpus, training_set_size)
+      signal.ProcessCorpusBeforeTraining(
+          self._languages,
+          training_corpus,
+          training_set_size,
+          dictionary)
       LogDebug("[SentenceSimilarityAligner] Preprocessing %s finished",
                signal.__class__.__name__)
 
@@ -68,13 +74,14 @@ class SentenceSimilarityAligner(Aligner):
                                    mdoc.GetSentence(lang1, sid1),
                                    lang2,
                                    mdoc.GetSentence(lang2, sid2),
-                                   are_aligned)
+                                   are_aligned,
+                                   dictionary)
       eta_clock.Tick(1)
     LogDebug("[SentenceSimilarityAligner] signal states");
     for signal in self._signals:
       signal.LogStateDebug()
 
-  def _TuneSignalWeights(self, training_corpus, training_set_size):
+  def _TuneSignalWeights(self, training_corpus, training_set_size, dictionary):
     LogDebug("[SentenceSimilarityAligner] signals: %s",
              ', '.join([signal.__class__.__name__ for signal in self._signals]))
     tuning_inputs = []
@@ -91,7 +98,8 @@ class SentenceSimilarityAligner(Aligner):
                     lang1,
                     mdoc.GetSentence(lang1, sid1),
                     lang2,
-                    mdoc.GetSentence(lang2, sid2)))
+                    mdoc.GetSentence(lang2, sid2),
+                    dictionary))
         tuning_inputs.append( (signals, are_aligned) )
     LogDebug("[SentenceSimilarityAligner] Tuning sentence match classifier...")
     self._weights, quality = TuneWeights(tuning_inputs)
@@ -143,25 +151,11 @@ class SentenceSimilarityAligner(Aligner):
     decision = 0
     debug = []
     for signal, weight in zip(self._signals, self._weights):
-      debug.append("(%s match=%.3f aggregated=%.3f weight=%.3f)" % (
-          signal.__class__.__name__,
-          signal.GetSimilarity(
-              lang1,
-              multilingual_document.GetSentence(lang1, sid1),
-              lang2,
-              multilingual_document.GetSentence(lang2, sid2)),
-          signal.GetAggregatedMatchProbability(
-              lang1,
-              multilingual_document.GetSentence(lang1, sid1),
-              lang2,
-              multilingual_document.GetSentence(lang2, sid2)),
-          weight))
       decision += signal.GetAggregatedMatchProbability(
           lang1,
           multilingual_document.GetSentence(lang1, sid1),
           lang2,
           multilingual_document.GetSentence(lang2, sid2)) * weight
-    LogDebugFull('signals: %s', ', '.join(debug)) # TODO this takes time
     return decision
 
   def _CalculateSentenceBaselines(self, multilingual_document):

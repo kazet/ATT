@@ -14,7 +14,11 @@ class SizeRatioSignal(Signal):
   def __init__(self, config_dict):
     super(SizeRatioSignal, self).__init__(config_dict)
 
-  def GetSimilarity(self, unused_lang1, sentence1, unused_lang2, sentence2):
+  def GetSimilarity(
+      self,
+      unused_lang1, sentence1,
+      unused_lang2, sentence2,
+      unused_dictionary):
     """Compute the signal value."""
     return math.log(float(len(sentence1)) / float(len(sentence2)))
 

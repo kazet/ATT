@@ -28,7 +28,8 @@ class WordCountRatioSignal(Signal):
 
   def GetSimilarity(self,
                     unused_lang1, sentence1,
-                    unused_lang2, sentence2):
+                    unused_lang2, sentence2,
+                    unused_dictionary):
     """Compute the signal value."""
     len1 = self._MemoizedWordCount(sentence1)
     len2 = self._MemoizedWordCount(sentence2)
