@@ -85,7 +85,9 @@ class SentenceSimilarityAligner(Aligner):
     LogDebug("[SentenceSimilarityAligner] signals: %s",
              ', '.join([signal.__class__.__name__ for signal in self._signals]))
     tuning_inputs = []
-    for identifier in training_corpus.GetFirstIdentifiers(training_set_size):
+    identifiers = training_corpus.GetFirstIdentifiers(training_set_size)
+    eta_clock = ETAClock(0, len(identifiers), "Preparing training set for tuning")
+    for identifier in identifiers:
       reference_alignment = \
         training_corpus.GetMultilingualAlignedDocument(identifier)
       mdoc = reference_alignment.GetMultilingualDocument()
@@ -101,6 +103,7 @@ class SentenceSimilarityAligner(Aligner):
                     mdoc.GetSentence(lang2, sid2),
                     dictionary))
         tuning_inputs.append( (signals, are_aligned) )
+      eta_clock.Tick()
     LogDebug("[SentenceSimilarityAligner] Tuning sentence match classifier...")
     self._weights, quality = TuneWeights(tuning_inputs)
     LogDebug("[SentenceSimilarityAligner] Sentence match classifier accuracy: %.2f%%",
