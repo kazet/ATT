@@ -2,6 +2,7 @@
 signals' in the documentation."""
 
 from att.log import LogDebug
+from att.utils import Median
 
 class Signal(object):
   """An abstract class describing a signal measuring how similar two sentences
@@ -35,11 +36,20 @@ class Signal(object):
     LogDebug("[%s] global aggregator: %s",
              self.__class__.__name__,
              str(self._global_aggregator))
-    LogDebug("[%s] min bucket size=%s, for per-pair aggregators: %s",
+    min_bucket_size = self._global_aggregator.MinBucketSize()
+    min_bucket_size_location = 'global'
+    bucket_sizes = [self._global_aggregator.GetBucketSizes()]
+    for key, value in self._aggregators.items():
+      if value.MinBucketSize() < min_bucket_size:
+        min_bucket_size = value.MinBucketSize()
+        min_bucket_size_location = str(key)
+      bucket_sizes.extend(value.GetBucketSizes())
+    LogDebug("[%s] min bucket size=%s (%s), median bucket size=%.3f",
              self.__class__.__name__,
-             str(self._global_aggregator.MinBucketSize()),
-             ','.join([str(k) + ': '+ str(v.MinBucketSize())
-                       for k, v in self._aggregators.items()]))
+             min_bucket_size,
+             min_bucket_size_location,
+             Median(bucket_sizes))
+
 
   def GetAggregatedMatchProbability(
       self,

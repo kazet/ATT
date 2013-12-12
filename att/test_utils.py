@@ -3,6 +3,7 @@ import os
 
 from att.test import TestCase
 from att.utils import \
+  Median, \
   GroupByKey, \
   HasExtension, \
   RecursiveListing, \
@@ -35,6 +36,18 @@ class UtilsTestCase(TestCase):
     DictIncMultiple(d, set(['b', 'c']))
     DictIncMultiple(d, set(['c']))
     self.assertEqual(d, {'a': 1, 'b': 2, 'c': 3})
+
+  def test_median(self):
+    self.assertRaises(
+        Exception,
+        Median,
+        [])
+    self.assertEqual(Median([1]), 1)
+    self.assertEqual(Median([2, 1]), 1.5)
+    self.assertEqual(Median([3, 2, 1]), 2)
+    l = [4, 3, 2, 1]
+    self.assertEqual(Median(l), 2.5)
+    self.assertEqual(l, [4, 3, 2, 1])
 
   def test_has_extension(self):
     self.assertTrue(HasExtension("/a/b/c.d", ".d"))

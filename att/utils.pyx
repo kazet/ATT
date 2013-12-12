@@ -2,6 +2,16 @@ import math
 import re
 import os
 
+def Median(l):
+  if len(l) == 0:
+    raise Exception("Cannot calculate the median of an empty list")
+  l_sorted = sorted(l)
+  if len(l) % 2 == 0:
+    return (l_sorted[len(l_sorted) / 2 - 1] + 
+            l_sorted[len(l_sorted) / 2]) / 2.0
+  else: # len(l) % 2 == 1
+    return l_sorted[len(l_sorted) / 2]
+
 def HasExtension(filename, required_extension):
   unused_name, extension = os.path.splitext(filename)
   return extension == required_extension

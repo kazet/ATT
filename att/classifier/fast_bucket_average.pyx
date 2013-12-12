@@ -15,9 +15,14 @@ class FastBucketAverage(object):
     self._global_count = 0
 
   def __str__(self):
-    buckets = ["[%.3f..%.3f: %.3f (%d)]" % (start, end, avg, count)
+    buckets = ["%.3f: %.3f" % ((start + end) / 2, avg)
                for avg, start, end, unused_sum, count in self.GetBuckets()]
-    return "[FastBucketAverage buckets: %s]" % ','.join(buckets)
+    return "[FastBucketAverage buckets: %s]" % ', '.join(buckets)
+
+  def GetBucketSizes(self):
+    return [count
+            for unused_avg, unused_start, unused_end, unused_sum, count
+            in self.GetBuckets()]
 
   def GetBucketIdForKey(self, key):
     """Return the ID for the bucket appropriate for the key."""
