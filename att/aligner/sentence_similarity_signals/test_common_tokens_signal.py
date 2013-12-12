@@ -14,7 +14,8 @@ class CommonTokensSignalTestCase(TestCase):
     en = Languages.GetByCode('en')
     pl = Languages.GetByCode('pl')
     signal = CommonTokensSignal({})
-    self.assertAlmostEqual(signal.GetSimilarity(en, sentence1, pl, sentence2),
+    similarity = signal.GetSimilarity(en, sentence1, pl, sentence2, None)
+    self.assertAlmostEqual(similarity,
                            2.0 / (len(word_tokenize(sentence1)) +
                                   len(word_tokenize(sentence2))))
 
@@ -24,7 +25,8 @@ class CommonTokensSignalTestCase(TestCase):
     en = Languages.GetByCode('en')
     pl = Languages.GetByCode('pl')
     signal = CommonTokensSignal({})
-    self.assertAlmostEqual(signal.GetSimilarity(en, sentence1, pl, sentence2),
+    similarity = signal.GetSimilarity(en, sentence1, pl, sentence2, None)
+    self.assertAlmostEqual(similarity,
                            3.0 / (len(word_tokenize(sentence1)) +
                                   len(word_tokenize(sentence2))))
 
@@ -34,7 +36,8 @@ class CommonTokensSignalTestCase(TestCase):
     en = Languages.GetByCode('en')
     pl = Languages.GetByCode('pl')
     signal = CommonTokensSignal({})
-    self.assertAlmostEqual(signal.GetSimilarity(en, sentence1, pl, sentence2),
+    similarity = signal.GetSimilarity(en, sentence1, pl, sentence2, None)
+    self.assertAlmostEqual(similarity,
                            1.0 / (len(word_tokenize(sentence1)) +
                                   len(word_tokenize(sentence2))))
 
@@ -44,6 +47,7 @@ class CommonTokensSignalTestCase(TestCase):
     en = Languages.GetByCode('en')
     pl = Languages.GetByCode('pl')
     signal = CommonTokensSignal({})
-    self.assertAlmostEqual(signal.GetSimilarity(en, sentence1, pl, sentence2),
+    similarity = signal.GetSimilarity(en, sentence1, pl, sentence2, None)
+    self.assertAlmostEqual(similarity,
                            0.0 / (len(word_tokenize(sentence1)) +
                                   len(word_tokenize(sentence2))))
