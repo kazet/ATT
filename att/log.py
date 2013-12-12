@@ -32,6 +32,14 @@ def LogInfo(*args):
   if global_context.global_context.GetArgs().verbose >= VerboseLevel.INFO:
     Log(*args)
 
+def LogInfoClear(*args):
+  """If log level is at least VerboseLevel.INFO,
+  Prints the first argument with all following passed as the
+  format arguments to the first one so that the current line gets
+  cleared and replaced with the new one."""
+  if global_context.global_context.GetArgs().verbose >= VerboseLevel.INFO:
+    LogClear(*args)
+
 def LogError(*args):
   """If log level is at least VerboseLevel.ERROR,
   Prints the first argument with all following passed as the
@@ -39,18 +47,20 @@ def LogError(*args):
   if global_context.global_context.GetArgs().verbose >= VerboseLevel.ERROR:
     Log(*args)
 
-qi = 0
+def FormatForLogs(*args):
+  if len(args) > 1:
+    return unicode(args[0] % tuple(args[1:]))
+  else:
+    return unicode(args[0])
+
 def Log(*args):
   """Prints the first argument with all following passed as the
   format arguments to the first one."""
-  global qi
+  sys.stderr.write("%s\n" % FormatForLogs(*args))
 
-  qi += 1
+def LogClear(*args):
+  """Prints the first argument with all following passed as the
+  format arguments to the first one so that the current line gets
+  cleared and replaced with the new one."""
+  sys.stderr.write("\r\x1B[2K%s" % FormatForLogs(*args))
 
-  if qi > 300:
-    return
-
-  if len(args) > 1:
-    print >> sys.stderr, unicode(args[0] % tuple(args[1:]))
-  else:
-    print >> sys.stderr, unicode(args[0])
