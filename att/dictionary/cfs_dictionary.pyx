@@ -48,7 +48,7 @@ class CFSDictionary(Dictionary):
         file_path = os.path.join(config_dir, config_dict['path'], file_name)
         file_handle = open(file_path)
         for data_line in file_handle.readlines():
-          data = data_line.strip().split('\t')
+          data = unicode(data_line.strip(), errors='ignore').split('\t')
 
           if len(data) < 2:
             continue
