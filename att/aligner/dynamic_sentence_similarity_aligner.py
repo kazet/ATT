@@ -8,7 +8,8 @@ def DynamicAlign(lang_a,
                  sentences_b,
                  sentence_baselines,
                  get_match_probability,
-                 min_match_probability):
+                 min_match_probability,
+                 dictionary):
   class Dir(object):
     A_SKIP, B_SKIP, MATCH = xrange(3)
 
@@ -43,12 +44,14 @@ def DynamicAlign(lang_a,
                               lang_a,
                               sent_a,
                               lang_b,
-                              sent_b)
+                              sent_b,
+                              dictionary)
       quality_a_skip = GetQuality(dpdata, sent_a - 1, sent_b)
       quality_b_skip = GetQuality(dpdata, sent_a, sent_b - 1)
       quality_match = GetQuality(dpdata, sent_a - 1, sent_b - 1) + \
                       match_probability * match_probability / match_baseline
-      if match_probability * match_probability / match_baseline >= min_match_probability and \
+      if match_probability * match_probability / match_baseline >= \
+              min_match_probability and \
           quality_match > quality_b_skip and \
           quality_match > quality_a_skip:
         dpdata[sent_a][sent_b] = (quality_match, Dir.MATCH)
@@ -79,7 +82,7 @@ class DynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
     super(DynamicSentenceSimilarityAligner, self).__init__(config)
     self._min_match_probability = config.get('min_match_probability', 0)
 
-  def Align(self, multilingual_document):
+  def Align(self, multilingual_document, dictionary):
     if len(self._languages) != 2:
       raise Exception("DynamicSentenceSimilarityAligner can be used only for"
                       " two languages.")
@@ -89,15 +92,20 @@ class DynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
     lang_b = self._languages[1]
     sentence_baselines = self._CalculateSentenceBaselines(multilingual_document)
     get_match_probability = \
-        lambda lang_a, sent_a, lang_b, sent_b: self.GetMatchProbability(
-            multilingual_document, lang_a, sent_a, lang_b, sent_b)
+        lambda lang_a, sent_a, lang_b, sent_b, dictionary: \
+            self.GetMatchProbability(
+                multilingual_document,
+                lang_a, sent_a,
+                lang_b, sent_b,
+                dictionary)
     matches = DynamicAlign(lang_a,
                            multilingual_document.GetSentences(lang_a),
                            lang_b,
                            multilingual_document.GetSentences(lang_b),
                            sentence_baselines,
                            get_match_probability,
-                           self._min_match_probability)
+                           self._min_match_probability,
+                           dictionary)
     alignment = Alignment(multilingual_document)
     for match in reversed(matches):
       alignment.AddMatch(match)

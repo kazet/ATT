@@ -4,6 +4,7 @@ import os
 import sys
 import nltk
 import argparse
+from att.log import LogDebug
 from att.pickle import SaveToFile
 from att.corpus import CorpusFactory
 from att.aligner import AlignerFactory
@@ -42,9 +43,13 @@ def main():
 
   current_directory = os.path.dirname(__file__)
   nltk.data.path.append(os.path.join(current_directory, "venv/nltk_data"))
+  LogDebug("[train.py] loading corpus...")
   training_corpus = CorpusFactory.MakeFromFile(args.training_corpus)
+  LogDebug("[train.py] loading aligner...")
   aligner = AlignerFactory.MakeFromFile(args.aligner)
+  LogDebug("[train.py] loading dictionary...")
   dictionary = DictionaryFactory.MakeFromFile(args.dictionary)
+  LogDebug("[train.py] training corpus...")
   aligner.Train(training_corpus, args.training_set_size, dictionary)
 
   SaveToFile(aligner, args.output)

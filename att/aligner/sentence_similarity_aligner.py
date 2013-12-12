@@ -149,8 +149,15 @@ class SentenceSimilarityAligner(Aligner):
                        decision,
                        are_aligned,
                        ', '.join(signals_debug)))
+    del tuning_inputs
 
-  def GetMatchProbability(self, multilingual_document, lang1, sid1, lang2, sid2):
+  def GetMatchProbability(self,
+                          multilingual_document,
+                          lang1,
+                          sid1,
+                          lang2,
+                          sid2,
+                          dictionary):
     decision = 0
     debug = []
     for signal, weight in zip(self._signals, self._weights):
@@ -158,10 +165,11 @@ class SentenceSimilarityAligner(Aligner):
           lang1,
           multilingual_document.GetSentence(lang1, sid1),
           lang2,
-          multilingual_document.GetSentence(lang2, sid2)) * weight
+          multilingual_document.GetSentence(lang2, sid2),
+          dictionary) * weight
     return decision
 
-  def _CalculateSentenceBaselines(self, multilingual_document):
+  def _CalculateSentenceBaselines(self, multilingual_document, dictionary):
     # We want not to know the absolute classifier result, but how the
     # result can be compared to average score of a sentence.
     sentence_baselines = {}
@@ -179,6 +187,7 @@ class SentenceSimilarityAligner(Aligner):
                     lang1,
                     sid1,
                     lang2,
-                    sid2))
+                    sid2,
+                    dictionary))
         sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
     return sentence_baselines
