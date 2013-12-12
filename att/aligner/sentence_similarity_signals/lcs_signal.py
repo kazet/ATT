@@ -20,6 +20,8 @@ class LCSSignal(Signal):
                     unused_lang2, sentence2,
                     unused_dictionary):
     """Compute the signal value."""
+    assert(type(sentence1).__name__ == 'unicode')
+    assert(type(sentence2).__name__ == 'unicode')
     prefix1 = unidecode(sentence1[:self._max_length])
     prefix2 = unidecode(sentence2[:self._max_length])
     return len(LongestCommonSubstring(prefix1, prefix2)) / float(len(prefix1) + len(prefix2))
