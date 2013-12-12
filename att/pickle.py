@@ -7,7 +7,7 @@ def LoadFromFile(file_name):
   return obj
 
 def SaveToFile(obj, file_name):
-  output_file = open(file_name, 'w')
-  pickle.dump(obj, output_file)
-  output_file.close()
+  p = pickle.Pickler(open(file_name,"wb"))
+  p.fast = True 
+  p.dump(obj)
 
