@@ -1,6 +1,6 @@
 import textwrap
 from att.html import RenderTemplate
-from att.log import LogDebug
+from att.log import LogDebug, LogDebugFull
 
 
 class Alignment(object):
@@ -111,7 +111,7 @@ class Alignment(object):
     common = len(set(reference_alignment.MatchesInNormalForm()) &
                  set(self.MatchesInNormalForm()))
 
-    LogDebug("alignment=%s, reference=%s",
+    LogDebugFull("alignment=%s, reference=%s",
              str(self.MatchesInNormalForm()),
              str(reference_alignment.MatchesInNormalForm()))
 
