@@ -1,6 +1,7 @@
 from aligner import Aligner
 from aligner_factory import AlignerFactory
 from trivial_aligner import TrivialAligner
+from hunalign_aligner import HunalignAligner
 from grow_sentence_similarity_aligner import GrowSentenceSimilarityAligner
 from dynamic_sentence_similarity_aligner import \
     DynamicSentenceSimilarityAligner
