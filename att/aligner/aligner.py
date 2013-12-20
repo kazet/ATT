@@ -2,6 +2,9 @@ from att.utils import Average
 from att.eta_clock import ETAClock
 
 class Aligner(object):
+  def __init__(self, config={}):
+    pass
+
   def Align(self, multilingual_document):
     raise NotImplementedError()
 

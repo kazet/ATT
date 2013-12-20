@@ -189,5 +189,6 @@ class SentenceSimilarityAligner(Aligner):
                     lang2,
                     sid2,
                     dictionary))
-        sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
+        sentence1 = multilingual_document.GetSentence(lang1, sid1)
+        sentence_baselines[(lang1, sentence1)] = Average(random_classification_values)
     return sentence_baselines

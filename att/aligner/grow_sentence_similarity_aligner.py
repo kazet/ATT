@@ -76,9 +76,11 @@ class GrowSentenceSimilarityAligner(SentenceSimilarityAligner):
                 LogDebugFull("Growset candidate: %s", str(growset))
                 quality = []
                 for (lang1, sent1, skip1), (lang2, sent2, skip2) in EnumeratePairs(growset):
+                  sent_content1 = multilingual_document.GetSentence(lang1, sent1)
+                  sent_content2 = multilingual_document.GetSentence(lang2, sent2)
                   baseline = \
-                    sentence_baselines[(lang1, sent1)] * \
-                    sentence_baselines[(lang2, sent2)]
+                    sentence_baselines[(lang1, sent_content1)] * \
+                    sentence_baselines[(lang2, sent_content2)]
                   match_probability = self.GetMatchProbability(
                           multilingual_document,
                           lang1,
