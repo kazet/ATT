@@ -1,7 +1,15 @@
 """See: `Dictionaries' in the documentation."""
 
+import os
+import tempfile
+
 class Dictionary(object):
   """An abstract class to represent dictionaries."""
+  def __init__(self):
+    self._hunalign_cache = {}
+
+  def EnumeratePairs(self, lang1, lang2):
+    raise NotImplementedError()
 
   def ToEnglish(self, lang, words, try_prefixes=True):
     """Translate a word or an atomic phrase (i.e. `Scotland Yard') into
@@ -14,3 +22,14 @@ class Dictionary(object):
     """Check, if two words (or atomic phrases, like `Scotland Yard')
     have a common translation to English."""
     raise NotImplementedError()
+
+  def CachedConvertToHunalignFormat(self, lang_a, lang_b):
+    if not (lang_a, lang_b) in self._hunalign_cache or not \
+        os.path.exists(self._hunalign_cache[(lang_a, lang_b)]):
+      handle, filename = tempfile.mkstemp()
+      output = os.fdopen(handle, 'w')
+      for word_a, word_b in self.EnumeratePairs(lang_a, lang_b):
+        output.write('%s @ %s\n' % (word_b, word_a))
+      output.close()
+      self._hunalign_cache[(lang_a, lang_b)] = filename
+    return self._hunalign_cache[(lang_a, lang_b)]

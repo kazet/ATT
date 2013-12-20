@@ -13,6 +13,8 @@ class CFSDictionary(Dictionary):
   """Dictionary subclass supporting the dictionary from
   http://cs.jhu.edu/~ccb/data/dictionaries/."""
   def __init__(self, config_dict):
+    super(CFSDictionary, self).__init__()
+
     LogDebug("[CFSDictionary] loading...")
     per_lang_dict = {}
     config_dir = config_dict.get('runtime', {}).get('config_dir', '')
@@ -68,6 +70,28 @@ class CFSDictionary(Dictionary):
             self._from_english[lang][english] = []
           self._from_english[lang][english].append(foreign)
     LogDebug("[CFSDictionary] loading finished")
+
+  def EnumeratePairs(self, lang1, lang2):
+    """Yields pairs, (word1, word2), where word1 and word2 both exist in the
+    dictionary and have a common translation to English."""
+    if lang1.IsEnglish():
+      for word1, word2 in self._EnumeratePairsSingleLang(lang2):
+        yield (word2, word1)
+    elif lang2.IsEnglish():
+      return self._EnumeratePairsSingleLang(lang1)
+    else:
+      for common_translation in self._from_english[lang1].iterkeys():
+        if common_translation in self._from_english[lang2]:
+          for word1 in self._from_english[lang1][common_translation]:
+            for word2 in self._from_english[lang2][common_translation]:
+              yield (word1, word2)
+
+  def _EnumeratePairsSingleLang(self, lang):
+    """Yields pairs, (word1, word2), where word1 exists in the dictionary for
+    lang and word2 is its translation to English"""
+    for english_word in self._from_english[lang].iterkeys():
+      for foreign_word in self._from_english[lang][english_word]:
+        yield (foreign_word, english_word)
 
   @staticmethod
   def _AddPrefixLinks(prefix_dict, word):

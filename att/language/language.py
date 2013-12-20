@@ -11,6 +11,9 @@ class Language(object):
     self._cfs_name = kwargs['cfs_name'] if 'cfs_name' in kwargs \
         else self._name.lower()
 
+  def IsEnglish(self):
+    return self._code == 'en'
+
   def GetCode(self):
     """Returns language two-letter code."""
     return self._code
