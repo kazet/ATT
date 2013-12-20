@@ -10,6 +10,15 @@ class VerboseLevel(object):
   DEBUG_FULL = 3
 
 
+def LogFileContentsDebug(line_prefix, file_name):
+  handle = open(file_name, 'r')
+  for line in handle.readlines():
+    if line[-1] == '\n':
+      line = line[:-1]
+    LogDebug("%s %s", line_prefix, line)
+  handle.close()
+
+
 def LogDebugFull(*args):
   """If log level is at least VerboseLevel.DEBUG_FULL,
   Prints the first argument with all following passed as the

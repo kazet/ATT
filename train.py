@@ -4,7 +4,7 @@ import os
 import sys
 import nltk
 import argparse
-from att.log import LogDebug
+from att.log import LogDebug, LogFileContentsDebug
 from att.pickle import SaveToFile
 from att.corpus import CorpusFactory
 from att.aligner import AlignerFactory
@@ -40,6 +40,8 @@ def main():
 
   args = parser.parse_args(sys.argv[1:])
   global_context.SetArgs(args)
+  LogFileContentsDebug("[train.py: aligner]", args.aligner)
+  LogFileContentsDebug("[train.py: training corpus]", args.training_corpus)
 
   current_directory = os.path.dirname(__file__)
   nltk.data.path.append(os.path.join(current_directory, "venv/nltk_data"))
