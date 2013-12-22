@@ -5,5 +5,7 @@ from hunalign_aligner import HunalignAligner
 from grow_sentence_similarity_aligner import GrowSentenceSimilarityAligner
 from dynamic_sentence_similarity_aligner import \
     DynamicSentenceSimilarityAligner
+from binary_split_sentence_similarity_aligner import \
+    BinarySplitSentenceSimilarityAligner
 from combined_dynamic_sentence_similarity_aligner import \
     CombinedDynamicSentenceSimilarityAligner

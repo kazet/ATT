@@ -34,8 +34,8 @@ Example
 -------
 
 Suppose you want to train the best aligner we have,
-``CombinedDynamicSentenceSimilarityAligner``
-(:doc:`/aligners/CombinedDynamicSentenceSimilarityAligner`) on the DGT TM
+``/aligners/CombinedDynamicSentenceSimilarityAligner``
+(:doc:`/aligners/combined_dynamic_sentence_similarity_aligner`) on the DGT TM
 corpus to align English, French and Polish.
 
 Step 0: follow :doc:`/installation`.
