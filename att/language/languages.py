@@ -2,6 +2,9 @@
 
 from att.language.language import Language
 
+class LanguageNotFound(Exception):
+  pass
+
 class Languages(object):
   """The collection of all languages supported."""
   LANGUAGES = {
@@ -27,7 +30,7 @@ class Languages(object):
     if lang in Languages.LANGUAGES:
       return Languages.GetByCode(lang)
     else:
-      return None
+      raise LanguageNotFound(code)
 
   @staticmethod
   def All():
@@ -40,7 +43,7 @@ class Languages(object):
     if code in Languages.LANGUAGES:
       return Languages.LANGUAGES[code]
     else:
-      return None
+      raise LanguageNotFound(code)
 
   @staticmethod
   def GetMultipleByCode(codes):
