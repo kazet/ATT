@@ -12,6 +12,7 @@ To build the documentation, run the following:
 And execute the following commands:
 * cd att/
 * virtualenv venv
+* . venv/bin/activate
 * python setup.py install
 * cd att/doc/
 * make html

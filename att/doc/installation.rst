@@ -14,3 +14,6 @@ ATT installation
 
 After that, ``train.py``, ``test_aligner.py`` and ``render_alignment.py`` will
 be available in your virtualenv.
+
+You probably want to train an aligner (:doc:`training_aligners`) and then evaluate it
+(:doc:`testing_aligners`) or use it to align a corpus (currently unavailable).

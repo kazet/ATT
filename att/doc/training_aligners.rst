@@ -25,6 +25,10 @@ Then, run ``train.py`` with the following options:
 --training_set_size
   The number of documents that will be taken from the corpus to train the
   aligner. For more (>5) languages, 100 is enough.
+--dictionary
+  The dictionary (:doc:`/dictionaries/index`) that will be used for training.
+  Currently it is required by all aligners. You can provide an empty
+  dictionary, but currently none are available.
 --v
    Verbose level (use -v to see some information messages, -vv to see
    debug messages and -vvv to see everything - the last option is slow
@@ -48,12 +52,15 @@ unzip them and configure the corpus by putting the following in
 .. code-block:: yaml
   :linenos:
 
-  class: CorpusTMX
-  languages:
-    - "en"
-    - "pl"
-    - "fr"
-  data_location: "unziped_dgt_memory_location/"
+  class: CorpusHead
+  n: 200
+  corpus:
+    class: CorpusTMX
+    languages:
+      - "en"
+      - "pl"
+      - "fr"
+    data_location: "unzipped_dgt_memory_location/"
 
 Then, configure the aligner, by creating ``aligner.yml``:
 
@@ -71,14 +78,22 @@ Then, configure the aligner, by creating ``aligner.yml``:
    - class: TokenStartSignal
    - class: UniqueTokensSignal
    - class: DictionaryWordsSignal
-     dictionary:
-      class: CFSDictionary
-      path: 'CFS-dicts'
-      languages:
-      - "en"
-      - "fr"
-      - "pl"
+
+Then, configure the dictionary. First, download the suggested dictionary
+(http://cs.jhu.edu/~ccb/data/dictionaries/CFS.Dictionaries.tar.gz)
+and extract it into the CFS-dictionaries directory. Then put the following
+in the ``dictionary.yml`` configuration file:
+
+.. code-block:: yaml
+   :linenos:
+
+   class: CFSDictionary
+   path: 'CFS-dictionaries/dict'
+   languages:
+     - "en"
+     - "fr"
+     - "pl"
 
 Then, run:
 
-``python train.py --training_corpus corpus.yml --output trained_aligner --aligner aligner.yml -vv``
+``python train.py --training_corpus corpus.yml --output trained_aligner --aligner aligner.yml --dictionary dictionary.yml -vvv``

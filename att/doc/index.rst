@@ -18,6 +18,7 @@ Contents:
   aligners/sentence_similarity_aligner
   aligners/grow_sentence_similarity_aligner
   aligners/dynamic_sentence_similarity_aligner
+  aligners/combined_dynamic_sentence_similarity_aligner
   aligners/sentence_similarity_aligner_signals
   corpora/corpus_tmx
   corpora/corpus_eurlex
