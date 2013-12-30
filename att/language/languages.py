@@ -22,6 +22,7 @@ class Languages(object):
     'et': Language(code='et', name='Estonian', id=12),
     'it': Language(code='it', name='Italian', id=13),
     'cz': Language(code='cz', name='Czech', id=14),
+    'fi': Language(code='fi', name='Finnish', id=15),
   }
 
   @staticmethod
