@@ -32,6 +32,11 @@ class FastBucketAverage(object):
     bucket = max(bucket, 0)
     return bucket
 
+  def GetBucketMid(self, bucket_id):
+    keyspace_length = self._key_to - self._key_from
+    unscaled_middle = float(bucket_id + 0.5) / float(self._num_buckets)
+    return self._key_from + keyspace_length * unscaled_middle
+
   def GetGlobalAverage(self):
     """Return the average of all values added."""
     return self._global_sum / self._global_count
@@ -92,4 +97,23 @@ class FastBucketAverage(object):
     if not self._counts[bucket]:
       return 0
     else:
-      return self._sums[bucket] / self._counts[bucket]
+      if key > self.GetBucketMid(bucket):
+        if bucket == self._num_buckets - 1 or not self._counts[bucket + 1]:
+          return self._sums[bucket] / self._counts[bucket]
+        else:
+          position = \
+            (self.GetBucketMid(bucket + 1) - key) / \
+            (self.GetBucketMid(bucket + 1) / self.GetBucketMid(bucket))
+          val_1 = self._sums[bucket] / self._counts[bucket]
+          val_2 = self._sums[bucket + 1] / self._counts[bucket + 1]
+          return position * val_1 + (1 - position) * val_2
+      else:
+        if bucket == 0 or not self._counts[bucket - 1]:
+          return self._sums[bucket] / self._counts[bucket]
+        else:
+          position = \
+            (key - self.GetBucketMid(bucket - 1)) / \
+            (self.GetBucketMid(bucket) / self.GetBucketMid(bucket - 1))
+          val_1 = self._sums[bucket - 1] / self._counts[bucket - 1]
+          val_2 = self._sums[bucket] / self._counts[bucket]
+          return position * val_1 + (1 - position) * val_2
