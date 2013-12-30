@@ -22,7 +22,7 @@ def main():
   parser.add_argument('--training_set_size',
                       help="The number of documents that will be taken from"
                            " the corpus to train the aligner.",
-                      default=500,
+                      default=300,
                       type=int)
   parser.add_argument('--output',
                       help="The file trained aligner should be written to.",
@@ -52,7 +52,11 @@ def main():
   LogDebug("[train.py] loading dictionary...")
   dictionary = DictionaryFactory.MakeFromFile(args.dictionary)
   LogDebug("[train.py] training corpus...")
-  aligner.Train(training_corpus, args.training_set_size, dictionary)
+  try:
+    aligner.Train(training_corpus, args.training_set_size, dictionary)
+  except MemoryError, unused_exception:
+    print ("MemoryError: try decreasing"
+           " --training_set_size to %d" % (args.training_set_size / 2))
 
   SaveToFile(aligner, args.output)
 
