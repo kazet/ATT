@@ -1,5 +1,5 @@
 import math
-
+from lxml.etree import XMLSyntaxError
 from aligner import Aligner
 from sentence_similarity_signals import SignalFactory
 from att.alignment import Alignment
@@ -64,9 +64,15 @@ class SentenceSimilarityAligner(Aligner):
     for identifier in identifiers:
       for signal in self._signals:
         signal.ResetCache()
-      reference_alignment = \
-        training_corpus.GetMultilingualAlignedDocument(identifier)
-      mdoc = reference_alignment.GetMultilingualDocument()
+      try:
+        reference_alignment = \
+          training_corpus.GetMultilingualAlignedDocument(identifier)
+        mdoc = reference_alignment.GetMultilingualDocument()
+      except XMLSyntaxError, e:
+        LogDebug("[SentenceSimilarityAligner] ignoring bad document: %s",
+                 identifier)
+        continue
+
       for (lang1, sid1), (lang2, sid2), are_aligned in \
           self._EnumerateTrainingSentencePairs(mdoc, reference_alignment):
         for signal in self._signals:
