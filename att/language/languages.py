@@ -30,7 +30,7 @@ class Languages(object):
     if lang in Languages.LANGUAGES:
       return Languages.GetByCode(lang)
     else:
-      raise LanguageNotFound(code)
+      raise LanguageNotFound(lang)
 
   @staticmethod
   def All():
