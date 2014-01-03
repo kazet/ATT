@@ -145,8 +145,10 @@ class CFSDictionary(Dictionary):
 
     return self._to_english[lang][words]
 
-  def IsTranslation(self, lang1, words1, lang2, words2):
+  def IsTranslation(self, lang1, words1, lang2, words2, try_prefixes=True):
     """Check, if two words (or atomic phrases, like `Scotland Yard')
-    have a common translation to English."""
-    return HaveCommonElement(self.ToEnglish(lang1, words1),
-                             self.ToEnglish(lang2, words2))
+    have a common translation to English. If try_prefixes is set to True,
+    all word/phrase prefixes will be tried if the word is not found in the
+    dictionary to find the match."""
+    return HaveCommonElement(self.ToEnglish(lang1, words1, try_prefixes),
+                             self.ToEnglish(lang2, words2, try_prefixes))

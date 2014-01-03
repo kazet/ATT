@@ -18,9 +18,11 @@ class Dictionary(object):
     match."""
     raise NotImplementedError()
 
-  def IsTranslation(self, lang1, words1, lang2, words2):
+  def IsTranslation(self, lang1, words1, lang2, words2, try_prefixes=True):
     """Check, if two words (or atomic phrases, like `Scotland Yard')
-    have a common translation to English."""
+    have a common translation to English. If try_prefixes is set to True,
+    all word/phrase prefixes will be tried if the word is not found in the
+    dictionary to find the match."""
     raise NotImplementedError()
 
   def CachedConvertToHunalignFormat(self, lang_a, lang_b):
