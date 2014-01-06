@@ -91,8 +91,11 @@ class FastBucketAverage(object):
       self._global_count += buckets[i][4]
 
   def Get(self, key):
-    """Return the average of all values in the bucket appropriate
-    for the key."""
+    """Return the weighted average of the average of all values in the bucket
+    appropriate for the key and the average of the values in the neighbour
+    bucket (e.g. if the bucket with its center in 1.0 has average value of 3
+    and the bucket with its center in 0.0 has the average value of 2, Get() on
+    0.5 should return 2.5)"""
     bucket = self.GetBucketIdForKey(key)
     if not self._counts[bucket]:
       return 0
