@@ -4,6 +4,7 @@ import os
 import sys
 import nltk
 import argparse
+from att.dictionary import DictionaryFactory
 from att.html import CopyDependencies
 from att.utils import MkdirIfNotExists, StripNonFilenameCharacters
 from att.log import LogDebug
@@ -21,6 +22,9 @@ def main():
                       required=True)
   parser.add_argument('--output_folder',
                       help="The location of the alignment output.",
+                      required=True)
+  parser.add_argument('--dictionary',
+                      help="The location of the aligner dictionary.",
                       required=True)
   parser.add_argument('--render_reference',
                       action='store_true',
@@ -46,6 +50,8 @@ def main():
   corpus = CorpusFactory.MakeFromFile(args.corpus)
   LogDebug("[render_alignment.py] loading aligner...")
   aligner = LoadFromFile(args.trained_aligner)
+  LogDebug("[render_alignment.py] loading dictionary...")
+  dictionary = DictionaryFactory.MakeFromFile(args.dictionary)
   LogDebug("[render_alignment.py] aligning and rendering...")
   MkdirIfNotExists(args.output_folder)
   for identifier in corpus.GetMultilingualDocumentIdentifiers():
@@ -60,7 +66,7 @@ def main():
         args.output_folder,
         'doc_%s.html' % StripNonFilenameCharacters(identifier))
     aligner \
-        .Align(corpus.GetMultilingualDocument(identifier)) \
+        .Align(corpus.GetMultilingualDocument(identifier), dictionary) \
         .RenderHTML(identifier, output_path)
   CopyDependencies(['common.css', 'alignment_render.css'], args.output_folder)
 
