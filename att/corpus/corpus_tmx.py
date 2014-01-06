@@ -1,12 +1,9 @@
 import os
-import lxml
-import lxml.etree
 from att.log import LogDebug
 from corpus import Corpus
-from att.document import Document
-from att.alignment import Alignment
 from att.multilingual_document import MultilingualDocument
 from att.language import Languages
+from att.tmx import LoadTMXAlignedDocument
 from att.utils import RecursiveListing, HasExtension
 from corpus_factory import CorpusFactory
 
@@ -39,25 +36,4 @@ class CorpusTMX(Corpus):
         .GetMultilingualDocument()
 
   def GetMultilingualAlignedDocument(self, identifier):
-    data = ''.join(open(identifier).readlines())
-
-    documents = dict([(lang, Document([], lang)) for lang in self._languages])
-
-    matches = []
-    sentences = lxml.etree.fromstring(data).xpath("//tu")
-    for sentence in sentences:
-      match = []
-      for translation in sentence.xpath("tuv"):
-        lang = Languages.FromLangRegionCode(translation.get('lang'))
-        if lang and lang in self._languages:
-          content = translation.xpath("string()")
-      
-          match.append( (lang, documents[lang].NumSentences()) )
-          documents[lang].AddSentence(unicode(content))
-      if len(match):
-        matches.append(match)
-
-    multilingual_document = MultilingualDocument(documents.values())
-    result = Alignment(multilingual_document, matches)
-    return result
-
+    return LoadTMXAlignedDocument(identifier, self._languages)

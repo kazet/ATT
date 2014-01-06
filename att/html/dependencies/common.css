@@ -54,3 +54,7 @@ table td:last-child, table th:last-child {
 table tr:last-child td {
   border-bottom: 1px solid #dddddd;
 }
+
+table th.small-header {
+  font-size: 8px;
+}

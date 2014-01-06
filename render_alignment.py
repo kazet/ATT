@@ -4,35 +4,35 @@ import os
 import sys
 import nltk
 import argparse
+
+from att.corpus import CorpusFactory
 from att.dictionary import DictionaryFactory
+from att.global_context import global_context
 from att.html import CopyDependencies
-from att.utils import MkdirIfNotExists, StripNonFilenameCharacters
+from att.language import Languages
 from att.log import LogDebug
 from att.pickle import LoadFromFile
-from att.corpus import CorpusFactory
-from att.global_context import global_context
+from att.tmx import LoadTMXAlignedDocument
+from att.utils import \
+    RecursiveListing, \
+    HasExtension, \
+    StripNonFilenameCharacters, \
+    MkdirIfNotExists
 
 def main():
   parser = argparse.ArgumentParser(description='Render an alignment to HTML.')
-  parser.add_argument('--trained_aligner',
-                      help="Trained aligner (written by train.py) to load.",
-                      required=True)
-  parser.add_argument('--corpus',
-                      help="The corpus that you want to be aligned.",
+  parser.add_argument('--input_folder',
+                      help="A folder containing aligned documents (in TMX"
+                           " format) to render.",
                       required=True)
   parser.add_argument('--output_folder',
-                      help="The location of the alignment output.",
+                      help="The location of the output.",
                       required=True)
-  parser.add_argument('--dictionary',
-                      help="The location of the aligner dictionary.",
+  parser.add_argument('-l', '--languages',
+                      nargs='+',
+                      help="The languages you want to extract from the aligned"
+                           " documents",
                       required=True)
-  parser.add_argument('--render_reference',
-                      action='store_true',
-                      help="If set to True, the reference alignment will be"
-                           " written next to the alignment you are rendering."
-                           " Requires the corpus to have reference"
-                           " alignments available.",
-                      default=False)
   parser.add_argument('--verbose', '-v',
                       action='count',
                       default=0,
@@ -44,31 +44,27 @@ def main():
   global_context.SetArgs(args)
 
   current_directory = os.path.dirname(__file__)
-  nltk.data.path.append(os.path.join(current_directory, "venv/nltk_data"))
 
-  LogDebug("[render_alignment.py] loading corpus...")
-  corpus = CorpusFactory.MakeFromFile(args.corpus)
-  LogDebug("[render_alignment.py] loading aligner...")
-  aligner = LoadFromFile(args.trained_aligner)
-  LogDebug("[render_alignment.py] loading dictionary...")
-  dictionary = DictionaryFactory.MakeFromFile(args.dictionary)
-  LogDebug("[render_alignment.py] aligning and rendering...")
-  MkdirIfNotExists(args.output_folder)
-  for identifier in corpus.GetMultilingualDocumentIdentifiers():
-    if args.render_reference:
-      reference_alignment = corpus.GetMultilingualAlignedDocument(identifier)
-      reference_output_path = os.path.join(
-        args.output_folder,
-        'reference_%s.html' % StripNonFilenameCharacters(identifier))
-      reference_alignment.RenderHTML(identifier, reference_output_path)
+  filenames = RecursiveListing(args.input_folder)
+  languages = Languages.GetMultipleByCode(args.languages)
 
-    output_path = os.path.join(
-        args.output_folder,
-        'doc_%s.html' % StripNonFilenameCharacters(identifier))
-    aligner \
-        .Align(corpus.GetMultilingualDocument(identifier), dictionary) \
-        .RenderHTML(identifier, output_path)
+  LogDebug("Rendering %s%s in %s to %s",
+           filenames[:20],
+           "..." if len(filenames) > 20 else "",
+           ', '.join(map(str, languages)),
+          args.output_folder)
+
   CopyDependencies(['common.css', 'alignment_render.css'], args.output_folder)
+  for filename in filenames:
+    if HasExtension(filename, '.tmx'):
+      assert(filename[:len(args.input_folder)] == args.input_folder)
+
+      identifier = StripNonFilenameCharacters(filename[len(args.input_folder):])
+      aligned_doc = LoadTMXAlignedDocument(filename, languages)
+      output_file_path = os.path.join(
+          args.output_folder,
+          '%s.html' % identifier)
+      aligned_doc.RenderHTML(identifier, output_file_path)
 
 if __name__ == "__main__":
     main()
