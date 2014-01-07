@@ -4,7 +4,16 @@ from att.test import TestCase
 from att.classifier.fast_bucket_average import FastBucketAverage
 
 class FastBucketAverageTestCase(TestCase):
-  def testMultipleBuckets(self):
+  def testSmoothing(self):
+    fast_bucket_average = FastBucketAverage(-2, 2, 4)
+    fast_bucket_average.Aggregate(-0.5, -1)
+    fast_bucket_average.Aggregate(0.5, 1)
+    fast_bucket_average.Aggregate(1, 0)
+    self.assertEqual(fast_bucket_average.Get(0), 0)
+    self.assertAlmostEqual(fast_bucket_average.Get(0.1), 0.2, places=3)
+    self.assertAlmostEqual(fast_bucket_average.Get(-0.1), -0.2, places=3)
+
+  def testNoSmoothing(self):
     fast_bucket_average = FastBucketAverage(0, 10, 10)
     fast_bucket_average.Aggregate(0, 1)
     fast_bucket_average.Aggregate(0, 0)
@@ -13,9 +22,9 @@ class FastBucketAverageTestCase(TestCase):
     fast_bucket_average.Aggregate(1.5, 1)
     fast_bucket_average.Aggregate(2, 3)
     fast_bucket_average.Aggregate(2, 0)
-    self.assertEqual(fast_bucket_average.Get(0), 0.5)
-    self.assertEqual(fast_bucket_average.Get(1), 1)
-    self.assertEqual(fast_bucket_average.Get(2), 1.5)
+    self.assertEqual(fast_bucket_average.Get(0, smooth=False), 0.5)
+    self.assertEqual(fast_bucket_average.Get(1, smooth=False), 1)
+    self.assertEqual(fast_bucket_average.Get(2, smooth=False), 1.5)
     self.assertEqual(fast_bucket_average.GetBuckets(),
                      [(0.5, 0.0, 1.0, 1.0, 2.0),
                       (1.0, 1.0, 2.0, 3.0, 3.0),

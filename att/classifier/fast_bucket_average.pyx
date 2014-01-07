@@ -37,6 +37,16 @@ class FastBucketAverage(object):
     unscaled_middle = float(bucket_id + 0.5) / float(self._num_buckets)
     return self._key_from + keyspace_length * unscaled_middle
 
+  def GetBucketMin(self, bucket_id):
+    keyspace_length = self._key_to - self._key_from
+    unscaled_middle = float(bucket_id) / float(self._num_buckets)
+    return self._key_from + keyspace_length * unscaled_middle
+
+  def GetBucketMax(self, bucket_id):
+    keyspace_length = self._key_to - self._key_from
+    unscaled_middle = float(bucket_id + 1) / float(self._num_buckets)
+    return self._key_from + keyspace_length * unscaled_middle
+
   def GetGlobalAverage(self):
     """Return the average of all values added."""
     return self._global_sum / self._global_count
@@ -77,6 +87,22 @@ class FastBucketAverage(object):
              float(self._counts[i]))
             for i in range(0, self._num_buckets)]
 
+  def HasEnoughBuckets(self, location, min_num_buckets=30):
+    bucket = self.GetBucketForKey(location)
+    if self._num_buckets <= 1:
+      return self._counts[bucket] > min_num_buckets
+
+    if bucket == 0:
+      return self._counts[bucket] > min_num_buckets and \
+             self._counts[bucket + 1] > min_num_buckets
+    elif bucket == self._num_buckets - 1:
+      return self._counts[bucket] > min_num_buckets and \
+             self._counts[bucket - 1] > min_num_buckets
+    else:
+      return self._counts[bucket] > min_num_buckets and \
+             self._counts[bucket + 1] > min_num_buckets and \
+             self._counts[bucket - 1] > min_num_buckets
+
   def SetBuckets(self, buckets):
     """Set the bucket content.
 
@@ -90,13 +116,16 @@ class FastBucketAverage(object):
       self._global_sum +=  buckets[i][3]
       self._global_count += buckets[i][4]
 
-  def Get(self, key):
+  def Get(self, key, smooth=True):
     """Return the weighted average of the average of all values in the bucket
     appropriate for the key and the average of the values in the neighbour
     bucket (e.g. if the bucket with its center in 1.0 has average value of 3
     and the bucket with its center in 0.0 has the average value of 2, Get() on
     0.5 should return 2.5)"""
     bucket = self.GetBucketIdForKey(key)
+    if not smooth:
+      return self._sums[bucket] / self._counts[bucket]
+
     if not self._counts[bucket]:
       return 0
     else:
@@ -106,17 +135,17 @@ class FastBucketAverage(object):
         else:
           position = \
             (self.GetBucketMid(bucket + 1) - key) / \
-            (self.GetBucketMid(bucket + 1) / self.GetBucketMid(bucket))
+            (self.GetBucketMid(bucket + 1) - self.GetBucketMid(bucket))
           val_1 = self._sums[bucket] / self._counts[bucket]
           val_2 = self._sums[bucket + 1] / self._counts[bucket + 1]
           return position * val_1 + (1 - position) * val_2
-      else:
+      else: # key <= self.GetBucketMid(bucket)
         if bucket == 0 or not self._counts[bucket - 1]:
           return self._sums[bucket] / self._counts[bucket]
         else:
           position = \
             (key - self.GetBucketMid(bucket - 1)) / \
-            (self.GetBucketMid(bucket) / self.GetBucketMid(bucket - 1))
+            (self.GetBucketMid(bucket) - self.GetBucketMid(bucket - 1))
           val_1 = self._sums[bucket - 1] / self._counts[bucket - 1]
           val_2 = self._sums[bucket] / self._counts[bucket]
-          return position * val_1 + (1 - position) * val_2
+          return position * val_2 + (1 - position) * val_1
