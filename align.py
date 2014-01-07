@@ -4,6 +4,8 @@ import os
 import sys
 import nltk
 import argparse
+from att.dictionary import DictionaryFactory
+from att.eta_clock import ETAClock
 from att.html import CopyDependencies
 from att.utils import MkdirIfNotExists, StripNonFilenameCharacters
 from att.log import LogDebug
@@ -15,6 +17,9 @@ def main():
   parser = argparse.ArgumentParser(description='Align a multilingual corpus'
                                                ' and write the output in the'
                                                ' TMX format.')
+  parser.add_argument('--dictionary',
+                      help="The location of the aligner dictionary.",
+                      required=True)
   parser.add_argument('--trained_aligner',
                       help="Trained aligner (written by train.py) to load.")
   parser.add_argument('--aligner_configuration',
@@ -41,6 +46,8 @@ def main():
 
   LogDebug("[align.py] loading corpus...")
   corpus = CorpusFactory.MakeFromFile(args.corpus)
+  LogDebug("[align.py] loading dictionary...")
+  dictionary = DictionaryFactory.MakeFromFile(args.dictionary)
   LogDebug("[align.py] loading aligner...")
   if args.trained_aligner:
     aligner = LoadFromFile(args.trained_aligner)
@@ -48,15 +55,17 @@ def main():
     aligner = AlignerFactory.MakeFromFile(args.aligner_configuration)
   else:
     assert(False)
-  LogDebug("[align.py] aligning and rendering...")
+  LogDebug("[align.py] aligning...")
   MkdirIfNotExists(args.output_folder)
+  eta_clock = ETAClock(0, len(identifiers), "Aligning corpus")
   for identifier in corpus.GetMultilingualDocumentIdentifiers():
     output_path = os.path.join(
         args.output_folder,
         '%s.tmx' % StripNonFilenameCharacters(identifier))
     aligner \
-        .Align(corpus.GetMultilingualDocument(identifier)) \
+        .Align(corpus.GetMultilingualDocument(identifier), dictionary) \
         .RenderTMX(identifier, output_path)
+    eta_clock.Tick()
 
 if __name__ == "__main__":
     main()

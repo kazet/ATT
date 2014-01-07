@@ -1,7 +1,3 @@
-table tr.is_matched td {
-  font-weight: bold;
-}
-
-table tr.is_matched td:first-child {
+table tr td:first-child {
   border-left: 3px solid #3a6ea5;
 }

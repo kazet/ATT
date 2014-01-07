@@ -17,12 +17,8 @@
         </tr>
       </thead>
       <tbody>
-        {% for is_matched, row in renderable_alignment_data %}
-          {% if is_matched %}
-            <tr class="is_matched">
-          {% else %}
-            <tr>
-          {% endif %}
+        {% for row in renderable_alignment_data %}
+          <tr>
             {% for unused_language, (sentence_id, sentence) in row %}
               <td>{{ sentence_id }}</td>
               <td>{{ sentence }}</td>

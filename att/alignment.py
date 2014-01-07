@@ -1,10 +1,39 @@
 import textwrap
 from xml.sax.saxutils import escape
-
+from copy import copy
 
 from att.html import RenderTemplate
 from att.log import LogDebug, LogDebugFull
 
+
+def MatchQuasiSort(matches):
+  """When matches can be sorted, sorts them. If not, sorts everything but the
+  parts that can't be sorted."""
+  sorted_matches = []
+  matches_remaining = copy(matches)
+  while len(matches_remaining) > 0:
+    minimas = {}
+    for match in matches_remaining:
+      for lang, sid in match:
+        if lang not in minimas:
+          minimas[lang] = sid
+        if sid < minimas[lang]:
+          minimas[lang] = sid
+    minimum_lang, minimum_sid = minimas.items()[0]
+    new_matches_remaining = []
+    minimum_removed = False
+    for match in matches_remaining:
+      found_minimum_now = False
+      if not minimum_removed:
+        if (minimum_lang, minimum_sid) in match:
+          found_minimum_now = True
+      if not found_minimum_now:
+        new_matches_remaining.append(match)
+      else:
+        minimum_removed = True
+        sorted_matches.append(match)
+    matches_remaining = new_matches_remaining
+  return sorted_matches
 
 class Alignment(object):
   def __init__(self, multilingual_document, matches=None):
@@ -44,50 +73,23 @@ class Alignment(object):
       i += 1
     return result
 
-  def RenderTMX(self, identifier, output_filename):
-    return self.Render(identifier, output_filename, 'TMX')
+  def RenderTMX(self, identifier, output_filename, languages=None):
+    return self.Render(identifier, output_filename, 'TMX', languages)
 
-  def RenderHTML(self, identifier, output_filename):
-    return self.Render(identifier, output_filename, 'HTML')
+  def RenderHTML(self, identifier, output_filename, languages=None):
+    return self.Render(identifier, output_filename, 'HTML', languages)
 
-  def Render(self, identifier, output_filename, render_type='HTML'):
-    def AddUnmatchedSentences(alignment_data, last_matched_sentences, positions):
-      max_skip = 0
-      for lang, sentence_id in positions:
-        max_skip = max(max_skip, sentence_id - last_matched_sentences[lang])
+  def Render(self, identifier, output_filename, render_type='HTML', languages=None):
+    if not languages:
+      languages = []
+      for match in self._matches:
+        for language, unused_sentence_id in match:
+          languages.append(language)
+      languages = set(languages)
+    sorted_matches = MatchQuasiSort(self._matches)
 
-      for i in range(1, max_skip):
-        unmatched_row = []
-        for lang, sentence_id in positions:
-          if last_matched_sentences[lang] + i < sentence_id:
-            unmatched_row.append( (lang, last_matched_sentences[lang] + i ) )
-        if len(unmatched_row) > 0:
-          alignment_data.append( (False, unmatched_row) )
-
-    alignment_data = []
-    last_matched_sentences = {}
-    languages = set()
-    for match in self._matches:
-      for lang, sentence_id in match:
-        languages.add(lang)
-
-    for language in languages:
-      last_matched_sentences[language] = 0
-
-    for match in self._matches:
-      AddUnmatchedSentences(alignment_data, last_matched_sentences, match)
-      alignment_data.append( (True, match) )
-
-      for lang, sentence_id in match:
-        if last_matched_sentences[lang] > sentence_id:
-          raise Exception("Non-monotonic alignment printing is not supported")
-        last_matched_sentences[lang] = sentence_id
-
-    sentence_nums = [(language, self._multilingual_document.NumSentences(language))
-                     for language in languages]
-    AddUnmatchedSentences(alignment_data, last_matched_sentences, sentence_nums)
     renderable_alignment_data = []
-    for is_matched, row in alignment_data:
+    for match in sorted_matches:
       sentences = {}
       for language in languages:
         sentences[language] = (u'N/A', u'')
@@ -97,9 +99,7 @@ class Alignment(object):
               ._multilingual_document \
               .GetDocument(language) \
               .GetSentence(sent_id))
-      renderable_alignment_data.append(
-          ( is_matched,
-            sorted(sentences.iteritems())))
+      renderable_alignment_data.append(sorted(sentences.iteritems()))
 
     if render_type == 'TMX':
       output_file = open(output_filename, 'w')
@@ -107,25 +107,15 @@ class Alignment(object):
       output_file.write('<!DOCTYPE tmx SYSTEM "tmx14.dtd">\n')
       output_file.write('<tmx version="1.4">\n')
       output_file.write('  <body>\n')
-      for is_matched, renderable_alignment in renderable_alignment_data:
-        if is_matched:
-          output_file.write('    <tu>\n')
-          output_file.write('      <prop type="Txt::Doc. No.">%s</prop>\n' % escape(identifier))
-          for language, value in renderable_alignment.items():
-            unused_sent_id, sentence = value
-            output_file.write('      <tuv xml:lang="%s">\n' % language)
-            output_file.write('        <seg>%s</seg>\n' % sentence)
-            output_file.write('      </tuv>')
-          output_file.write('    </tu>\n')
-        else:
-          for language, value in renderable_alignment.items():
-            unused_sent_id, sentence = value
-            output_file.write('    <tu>\n')
-            output_file.write('      <prop type="Txt::Doc. No.">%s</prop>\n' % escape(identifier))
-            output_file.write('      <tuv xml:lang="%s">\n' % language)
-            output_file.write('        <seg>%s</seg>\n' % sentence)
-            output_file.write('      </tuv>')
-            output_file.write('    </tu>\n')
+      for renderable_alignment in renderable_alignment_data:
+        output_file.write('    <tu>\n')
+        output_file.write('      <prop type="Txt::Doc. No.">%s</prop>\n' % escape(identifier))
+        for language, value in renderable_alignment.items():
+          unused_sent_id, sentence = value
+          output_file.write('      <tuv xml:lang="%s">\n' % language)
+          output_file.write('        <seg>%s</seg>\n' % sentence)
+          output_file.write('      </tuv>')
+        output_file.write('    </tu>\n')
       output_file.write('  </body>\n')
       output_file.write('</tmx>\n')
       output_file.close()
