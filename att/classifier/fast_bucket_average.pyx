@@ -87,11 +87,10 @@ class FastBucketAverage(object):
              float(self._counts[i]))
             for i in range(0, self._num_buckets)]
 
-  def HasEnoughBuckets(self, location, min_num_buckets=30):
-    bucket = self.GetBucketForKey(location)
+  def HasEnoughBuckets(self, location, min_num_buckets=10):
+    bucket = self.GetBucketIdForKey(location)
     if self._num_buckets <= 1:
       return self._counts[bucket] > min_num_buckets
-
     if bucket == 0:
       return self._counts[bucket] > min_num_buckets and \
              self._counts[bucket + 1] > min_num_buckets

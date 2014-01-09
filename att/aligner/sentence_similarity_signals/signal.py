@@ -63,15 +63,10 @@ class Signal(object):
     if not (lang1, lang2) in self._aggregators:
       return self._global_aggregator.Get(similarity)
 
-    unused_sum, b_count = \
-        self._aggregators[(lang1, lang2)].GetBucketForKey(similarity)
-
-    if b_count > 40:  # TODO remove the const
+    if self._aggregators[(lang1, lang2)].HasEnoughBuckets(similarity):
       return self._aggregators[(lang1, lang2)].Get(similarity)
     else:
-      unused_sum, b_count = \
-          self._global_aggregator.GetBucketForKey(similarity)
-      if b_count > 40:
+      if self._global_aggregator.HasEnoughBuckets(similarity):
         return self._global_aggregator.Get(similarity)
       else:
         return self._global_aggregator.GetGlobalAverage()
