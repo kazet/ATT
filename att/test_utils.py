@@ -3,21 +3,22 @@ import os
 
 from att.test import TestCase
 from att.utils import \
-  Median, \
-  GroupByKey, \
-  HasExtension, \
-  RecursiveListing, \
   Average, \
-  SetSimilarity, \
-  ListSimilarity, \
-  DictUpdateWithString, \
-  EnumeratePairs, \
-  Gauss, \
-  LongestCommonSubstring, \
-  TupleSplit, \
   DictInc, \
   DictIncMultiple, \
-  Flatten
+  DictUpdateWithString, \
+  EnumeratePairs, \
+  Flatten, \
+  Gauss, \
+  GroupByKey, \
+  HasExtension, \
+  ListSimilarity, \
+  LongestCommonSubstring, \
+  Median, \
+  RecursiveListing, \
+  SetSimilarity, \
+  StandardDeviation, \
+  TupleSplit
 
 class UtilsTestCase(TestCase):
   def test_dict_inc(self):
@@ -29,6 +30,9 @@ class UtilsTestCase(TestCase):
     DictInc(d, 'c')
     DictInc(d, 'c')
     self.assertEqual(d, {'a': 1, 'b': 2, 'c': 3})
+
+  def test_standard_deviation(self):
+    self.assertAlmostEqual(StandardDeviation([2, 4, 4, 4, 5, 5, 7, 9]), 2)
 
   def test_dict_inc_multiple(self):
     d = {'c': 0}

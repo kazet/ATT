@@ -167,6 +167,22 @@ def Average(lst):
   return sum(lst) / float(len(lst))
 
 
+def StandardDeviation(lst):
+  """Returns the standard deviation of the list."""
+  avg = Average(lst)
+  return math.sqrt(sum([(item - avg) ** 2 for item in lst])/len(lst))
+
+
+def GetStatisticsString(lst):
+  """Returns a string containing list statistics"""
+  percentile_10 = lst[int(0.10 * len(lst))]
+  percentile_90 = lst[int(0.90 * len(lst))]
+  return ("Average: %.3f, " % Average(lst) +
+          "standard deviation: %.3f, " % StandardDeviation(lst) +
+          "10th percentile: %.3f, " % percentile_10 +
+          "90th percentile: %.3f\n" % percentile_90)
+
+
 def Gauss(x, standard_deviation=1, center=0):
   """Calculate the normal distribution."""
   return \
