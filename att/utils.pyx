@@ -167,6 +167,12 @@ def Average(lst):
   return sum(lst) / float(len(lst))
 
 
+def MeanAbsoluteError(lst):
+  """Returns the mean absoute error."""
+  avg = Average(lst)
+  return sum([abs(item - avg) for item in lst])/float(len(lst))
+
+
 def StandardDeviation(lst):
   """Returns the standard deviation of the list."""
   avg = Average(lst)
@@ -175,12 +181,13 @@ def StandardDeviation(lst):
 
 def GetStatisticsString(lst):
   """Returns a string containing list statistics"""
-  percentile_10 = lst[int(0.10 * len(lst))]
-  percentile_90 = lst[int(0.90 * len(lst))]
+  percentile_10 = sorted(lst)[int(0.10 * len(lst))]
+  percentile_90 = sorted(lst)[int(0.90 * len(lst))]
   return ("Average: %.3f, " % Average(lst) +
-          "standard deviation: %.3f, " % StandardDeviation(lst) +
+          "std dev: %.3f, " % StandardDeviation(lst) +
+          "MAE: %.3f, " % MeanAbsoluteError(lst) +
           "10th percentile: %.3f, " % percentile_10 +
-          "90th percentile: %.3f\n" % percentile_90)
+          "90th percentile: %.3f" % percentile_90)
 
 
 def Gauss(x, standard_deviation=1, center=0):
@@ -196,6 +203,7 @@ def SetSimilarity(s1, s2):
   if not s1 and not s2:
     return 0
   return len(s1 & s2) / float(len(s1) + len(s2))
+
 
 def NumCommonElements(s1, s2):
   """Return the number of common elements in s1 and s2."""
@@ -217,6 +225,7 @@ def NumCommonElements(s1, s2):
       s2_iter += 1
   return num_common
 
+
 def ListSimilarity(s1, s2):
   """Returns the size of the largest common subset of s1 and s2
   elements divided by their length combined or 0 if both are empty."""
@@ -224,10 +233,12 @@ def ListSimilarity(s1, s2):
     return 0
   return NumCommonElements(s1, s2) / (1.0 * (len(s1) + len(s2)))
 
+
 def HaveCommonElement(s1, s2):
   """Returns True if s1 and s2 have at least one element in common,
   False otherwise."""
   return NumCommonElements(s1, s2) > 0
+
 
 def EnumeratePairs(lst):
   """Enumerates all pairs in lst, without repeats ((A, B) and (B, A)
@@ -244,3 +255,13 @@ def Flatten(lst):
   for item in lst:
     lst_sum.extend(item)
   return lst_sum
+
+
+def Subsets(lst):
+  """Yields all possible subsets of lst."""
+  if len(lst) > 0:
+    for item in Subsets(lst[1:]):
+      yield item
+      yield [lst[0]] + item
+  else:
+    yield []

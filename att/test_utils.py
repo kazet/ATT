@@ -14,13 +14,25 @@ from att.utils import \
   HasExtension, \
   ListSimilarity, \
   LongestCommonSubstring, \
+  MeanAbsoluteError, \
   Median, \
   RecursiveListing, \
   SetSimilarity, \
   StandardDeviation, \
+  Subsets, \
   TupleSplit
 
 class UtilsTestCase(TestCase):
+  def test_subsets(self):
+    subsets = set([tuple(subset) for subset in Subsets(range(4))])
+    expected_subsets = set([
+        (),
+        (0,), (1,), (2,), (3,),
+        (0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3),
+        (0, 1, 2), (0, 1, 3), (0, 2, 3), (1, 2, 3),
+        (0, 1, 2, 3)])
+    self.assertEqual(subsets, expected_subsets)
+
   def test_dict_inc(self):
     d = {'c': 0}
     DictInc(d, 'a')
@@ -33,6 +45,9 @@ class UtilsTestCase(TestCase):
 
   def test_standard_deviation(self):
     self.assertAlmostEqual(StandardDeviation([2, 4, 4, 4, 5, 5, 7, 9]), 2)
+
+  def test_mean_absolute_error(self):
+    self.assertAlmostEqual(MeanAbsoluteError([1,2,3,4,5]), 6.0 / 5.0)
 
   def test_dict_inc_multiple(self):
     d = {'c': 0}

@@ -29,8 +29,8 @@ class Aligner(object):
       recalls.append(evaluation['recall'])
       f_measures.append(evaluation['f_measure'])
       LogDebug("Precision so far: %s\n"
-               "recall so far: %s\n"
-               "f-measure so far: %s\n",
+               "Recall so far: %s\n"
+               "F-measure so far: %s\n",
                GetStatisticsString(precisions),
                GetStatisticsString(recalls),
                GetStatisticsString(f_measures))
