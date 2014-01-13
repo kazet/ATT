@@ -57,8 +57,9 @@ def main():
     assert(False)
   LogDebug("[align.py] aligning...")
   MkdirIfNotExists(args.output_folder)
+  identifiers = list(corpus.GetMultilingualDocumentIdentifiers())
   eta_clock = ETAClock(0, len(identifiers), "Aligning corpus")
-  for identifier in corpus.GetMultilingualDocumentIdentifiers():
+  for identifier in identifiers:
     output_path = os.path.join(
         args.output_folder,
         '%s.tmx' % StripNonFilenameCharacters(identifier))
