@@ -64,7 +64,7 @@ def main():
       output_file_path = os.path.join(
           args.output_folder,
           '%s.html' % identifier)
-      aligned_doc.RenderHTML(identifier, output_file_path)
+      aligned_doc.RenderHTML(identifier, output_file_path, languages)
 
 if __name__ == "__main__":
     main()
