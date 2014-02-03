@@ -2,7 +2,7 @@
 
 from att.classifier import FastBucketAverage
 from att.utils import Flatten, EnumeratePairs
-from att.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize
 from att.eta_clock import ETAClock
 from att.aligner.sentence_similarity_signals.signal import Signal
 from att.aligner.sentence_similarity_signals.signal_factory import SignalFactory
