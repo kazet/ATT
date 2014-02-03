@@ -93,7 +93,7 @@ class Alignment(object):
       sentences = {}
       for language in languages:
         sentences[language] = (u'N/A', u'')
-      for language, sent_id in row:
+      for language, sent_id in match:
         if sent_id < self._multilingual_document.NumSentences(language):
           sentences[language] = (sent_id, self \
               ._multilingual_document \
@@ -109,11 +109,11 @@ class Alignment(object):
       output_file.write('  <body>\n')
       for renderable_alignment in renderable_alignment_data:
         output_file.write('    <tu>\n')
-        output_file.write('      <prop type="Txt::Doc. No.">%s</prop>\n' % escape(identifier))
-        for language, value in renderable_alignment.items():
+        output_file.write(u'      <prop type="Txt::Doc. No.">%s</prop>\n' % escape(identifier))
+        for language, value in renderable_alignment:
           unused_sent_id, sentence = value
-          output_file.write('      <tuv xml:lang="%s">\n' % language)
-          output_file.write('        <seg>%s</seg>\n' % sentence)
+          output_file.write('      <tuv lang="%s">\n' % language)
+          output_file.write('        <seg>%s</seg>\n' % unicode(sentence).encode('utf-8'))
           output_file.write('      </tuv>')
         output_file.write('    </tu>\n')
       output_file.write('  </body>\n')
