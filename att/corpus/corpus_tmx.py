@@ -10,12 +10,9 @@ from corpus_factory import CorpusFactory
 @CorpusFactory.Register
 class CorpusTMX(Corpus):
   """Corpus in TMX format."""
-  ALL_LANGUAGES = ['en', 'de', 'es', 'pl']
-
   def __init__(self, config):
     LogDebug("[CorpusTMX] initialization...")
-    self._languages = Languages.GetMultipleByCode(
-        config.get('languages', CorpusTMX.ALL_LANGUAGES))
+    self._languages = Languages.GetMultipleByCode(config['languages'])
     LogDebug("[CorpusTMX] languages: %s",
              ', '.join(map(str, self._languages)))
     self._config_dir = config.get('runtime', {}).get('config_dir', '')

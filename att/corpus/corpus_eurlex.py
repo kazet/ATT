@@ -12,11 +12,8 @@ from corpus_factory import CorpusFactory
 
 @CorpusFactory.Register
 class CorpusEurlex(Corpus):
-  ALL_LANGUAGES = ['en', 'de', 'es', 'pl']
-
   def __init__(self, config):
-    self._languages = Languages.GetMultipleByCode(
-        config.get('languages', CorpusEurlex.ALL_LANGUAGES))
+    self._languages = Languages.GetMultipleByCode(config['languages'])
     self._config_dir = config.get('runtime', {}).get('config_dir', '')
     self._identifiers_file = os.path.join(self._config_dir,
                                           config['identifiers_file'])
