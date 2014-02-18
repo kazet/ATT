@@ -11,6 +11,11 @@ class Signal(object):
     self._aggregators = {}
     self._global_aggregator = self._GetAggregator()
 
+  def GetGlobalBuckets(self):
+    for average, begin, end, unused_sum, unused_num in \
+        self._global_aggregator.GetBuckets():
+      yield (average, 0.5 * (begin + end))
+
   def AddTrainingRecord(
       self,
       lang1,
