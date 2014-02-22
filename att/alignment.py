@@ -5,36 +5,6 @@ from copy import copy
 from att.html import RenderTemplate
 from att.log import LogDebug, LogDebugFull
 
-
-def MatchQuasiSort(matches):
-  """When matches can be sorted, sorts them. If not, sorts everything but the
-  parts that can't be sorted."""
-  sorted_matches = []
-  matches_remaining = copy(matches)
-  while len(matches_remaining) > 0:
-    minimas = {}
-    for match in matches_remaining:
-      for lang, sid in match:
-        if lang not in minimas:
-          minimas[lang] = sid
-        if sid < minimas[lang]:
-          minimas[lang] = sid
-    minimum_lang, minimum_sid = minimas.items()[0]
-    new_matches_remaining = []
-    minimum_removed = False
-    for match in matches_remaining:
-      found_minimum_now = False
-      if not minimum_removed:
-        if (minimum_lang, minimum_sid) in match:
-          found_minimum_now = True
-      if not found_minimum_now:
-        new_matches_remaining.append(match)
-      else:
-        minimum_removed = True
-        sorted_matches.append(match)
-    matches_remaining = new_matches_remaining
-  return sorted_matches
-
 class Alignment(object):
   def __init__(self, multilingual_document, matches=None):
     self._multilingual_document = multilingual_document
@@ -86,7 +56,7 @@ class Alignment(object):
         for language, unused_sentence_id in match:
           languages.append(language)
       languages = set(languages)
-    sorted_matches = MatchQuasiSort(self._matches)
+    sorted_matches = sorted(self._matches)
 
     renderable_alignment_data = []
     for match in sorted_matches:

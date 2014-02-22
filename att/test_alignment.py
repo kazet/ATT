@@ -1,5 +1,5 @@
 from att.test import TestCase
-from att.alignment import Alignment, MatchQuasiSort
+from att.alignment import Alignment
 from att.document import Document
 from att.language import Languages
 from att.multilingual_document import MultilingualDocument
@@ -9,24 +9,6 @@ class AlignmentTestCase(TestCase):
     self.multilingual_document = MultilingualDocument([
       Document(["a", "b"], Languages.GetByCode("pl")),
       Document(["c", "d"], Languages.GetByCode("en"))])
-
-  def test_quasi_sort(self):
-    sorted_match = MatchQuasiSort([
-      [('en', 5), ('pl', 4), ('de', 4)],
-      [('en', 4), ('pl', 5), ('de', 5)],
-      [('en', 2), ('pl', 2), ('de', 3)],
-      [('en', 1), ('pl', 1), ('de', 1)],
-      [('de', 6), ('pl', 5)],
-      [('en', 3), ('pl', 3), ('de', 2)]])
-    expected_result = [
-      [('en', 1), ('pl', 1), ('de', 1)],
-      [('en', 3), ('pl', 3), ('de', 2)],
-      [('en', 2), ('pl', 2), ('de', 3)],
-      [('en', 5), ('pl', 4), ('de', 4)],
-      [('en', 4), ('pl', 5), ('de', 5)],
-      [('de', 6), ('pl', 5)]]
-    self.assertEqual(sorted_match, expected_result)
-
 
   def test_add_match(self):
     alignment = Alignment(self.multilingual_document)
