@@ -35,7 +35,7 @@ def DynamicAlign(multilingual_document,
   #               best alignment sentences[lang_a][:A-1] and
   #               sentences[lang_b][:B-1].
   dpdata = [[None for unused_sentenceB in xrange(len(sentences_b))]
-            for unused_sentenceA in xrange(len(sentences_a))]
+                  for unused_sentenceA in xrange(len(sentences_a))]
 
   for sent_a in  xrange(len(sentences_a)):
     for sent_b in  xrange(len(sentences_b)):
