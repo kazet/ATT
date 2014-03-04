@@ -23,6 +23,8 @@ class Languages(object):
     'it': Language(code='it', name='Italian', id=13),
     'cz': Language(code='cz', name='Czech', id=14),
     'fi': Language(code='fi', name='Finnish', id=15),
+    'la': Language(code='la', name='Latin', id=16),
+    'hr': Language(code='hr', name='Croatian', id=17),
   }
 
   @staticmethod
