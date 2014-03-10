@@ -157,6 +157,47 @@ class SentenceSimilarityAligner(Aligner):
                        ', '.join(signals_debug)))
     del tuning_inputs
 
+  def _CalculateSentenceBaselines(
+        self,
+        multilingual_document,
+        dictionary,
+        max_num_consecutive_sentences=2):
+    """Returns a dictionary of (lang, sentid) -> baseline (what is the average
+    classifier result for (sentence[lang, sentid], sentences[lang2, whatever])
+    pairs) and (lang, sentid, num) -> baseline (what is the averae classifier
+    result for (sentence[lang, sentid] + sentence[lang, sentid + 1] + ... +
+    sentence[lang, sentid + num], sentences[lang2, whatever] + ... +
+    sentences[lang2, whatever + num]).
+
+    We want not to know the absolute classifier result, but how the
+    result can be compared to average score of a sentence."""
+    sentence_baselines = {}
+    for lang1 in self._languages:
+      for sid1 in range(multilingual_document.NumSentences(lang1)):
+        for num in range(1, max_num_consecutive_sentences):
+          random_classification_values = []
+          for lang2 in self._languages:
+            if lang2 == lang1:
+              continue
+
+            for sid2 in range(min(multilingual_document.NumSentences(lang2), 20)):
+              random_classification_values.append(
+                  self.GetMatchProbabilityMultipleSentences(
+                      multilingual_document,
+                      lang1,
+                      sid1,
+                      num,
+                      lang2,
+                      sid2,
+                      num,
+                      dictionary))
+          sentence1 = multilingual_document.GetSentence(lang1, sid1)
+          if num == 1:
+            sentence_baselines[(lang1, sentence1)] = Average(random_classification_values)
+          sentence_baselines[(lang1, sentence1, num)] = Average(random_classification_values)
+    print len(sentence_baselines)
+    return sentence_baselines
+
   def GetMatchProbability(self,
                           multilingual_document,
                           lang1,
@@ -175,26 +216,30 @@ class SentenceSimilarityAligner(Aligner):
           dictionary) * weight
     return decision
 
-  def _CalculateSentenceBaselines(self, multilingual_document, dictionary):
-    # We want not to know the absolute classifier result, but how the
-    # result can be compared to average score of a sentence.
-    sentence_baselines = {}
-    for lang1 in self._languages:
-      for sid1 in range(multilingual_document.NumSentences(lang1)):
-        random_classification_values = []
-        for lang2 in self._languages:
-          if lang2 == lang1:
-            continue
+  def GetMatchProbabilityMultipleSentences(self,
+                          multilingual_document,
+                          lang1,
+                          sid1,
+                          num1,
+                          lang2,
+                          sid2,
+                          num2,
+                          dictionary):
+    sents1 = ""
+    for num in range(0, num1):
+      sents1 += multilingual_document.GetSentence(lang1, sid1 + num)
 
-          for sid2 in range(min(multilingual_document.NumSentences(lang2), 40)):
-            random_classification_values.append(
-                self.GetMatchProbability(
-                    multilingual_document,
-                    lang1,
-                    sid1,
-                    lang2,
-                    sid2,
-                    dictionary))
-        sentence1 = multilingual_document.GetSentence(lang1, sid1)
-        sentence_baselines[(lang1, sentence1)] = Average(random_classification_values)
-    return sentence_baselines
+    sents2 = ""
+    for num in range(0, num2):
+      sents2 += multilingual_document.GetSentence(lang2, sid2 + num)
+
+    decision = 0
+    debug = []
+    for signal, weight in zip(self._signals, self._weights):
+      decision += signal.GetAggregatedMatchProbability(
+          lang1,
+          sents1,
+          lang2,
+          sents2,
+          dictionary) * weight
+    return decision
