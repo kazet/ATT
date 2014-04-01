@@ -81,7 +81,7 @@ class HapaxSignal(Signal):
       return 1
     elif num_hapaxen1 == 1 and num_hapaxen2 == 1:
       return 2
-    elif num_hapaxen1 > 2 and num_hapaxen2 > 2:
+    elif num_hapaxen1 > 1 and num_hapaxen2 > 1:
       return 3
     else:
       return 0
