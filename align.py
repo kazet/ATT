@@ -4,6 +4,7 @@ import os
 import sys
 import nltk
 import argparse
+from att.aligner import AlignerFactory
 from att.dictionary import DictionaryFactory
 from att.eta_clock import ETAClock
 from att.html import CopyDependencies
@@ -58,6 +59,7 @@ def main():
   LogDebug("[align.py] aligning...")
   MkdirIfNotExists(args.output_folder)
   identifiers = list(corpus.GetMultilingualDocumentIdentifiers())
+  LogDebug("[align.py] %d document(s) to align..." % len(identifiers))
   eta_clock = ETAClock(0, len(identifiers), "Aligning corpus")
   for identifier in identifiers:
     output_path = os.path.join(
