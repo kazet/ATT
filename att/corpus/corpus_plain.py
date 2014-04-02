@@ -47,7 +47,8 @@ class CorpusPlain(Corpus):
       if not os.path.exists(document_path):
         continue
 
-      sentences = open(document_path).readlines()
+      sentences = [unicode(sentence, encoding="utf-8", errors="ignore")
+                   for sentence in open(document_path).readlines()]
       docs.append(Document(sentences, language))
     assert len(docs) > 0
     return MultilingualDocument(docs)
