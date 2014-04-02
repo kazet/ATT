@@ -8,6 +8,7 @@ from att.utils import Flatten
 from nltk.tokenize import word_tokenize
 from att.aligner.sentence_similarity_signals.signal import Signal
 from att.aligner.sentence_similarity_signals.signal_factory import SignalFactory
+from exceptions import TrainingRequiredException
 
 @SignalFactory.Register
 class DictionaryWordsSignal(Signal):
@@ -52,6 +53,9 @@ class DictionaryWordsSignal(Signal):
 
   def GetSimilarity(self, lang1, sentence1, lang2, sentence2, dictionary):
     """Compute the signal value."""
+    if not hasattr(self, '_word_statistics'):
+      raise TrainingRequiredException("Cannot use DictionaryWordsSignal"
+                                      "without training")
     words1 = self._MemoizedWordTokenizeAndTranslate(
         lang1, sentence1, dictionary)
     words2 = self._MemoizedWordTokenizeAndTranslate(
