@@ -6,6 +6,8 @@ from att.alignment import Alignment
 from att.classifier.signal_aggregator import TuneWeights
 from att.dictionary import DictionaryFactory
 from att.eta_clock import ETAClock
+from sentence_similarity_signals.signals_initial_bucket_value_collection import \
+  SignalsInitialBucketValueCollection
 from att.global_context import global_context
 from att.language import Languages
 from att.log import LogDebug, VerboseLevel, LogDebugFull
@@ -22,6 +24,13 @@ class SentenceSimilarityAligner(Aligner):
         signal_config['runtime'] = config['runtime']
 
       self._signals.append(SignalFactory.Make(signal_config))
+    self._weights = [1 for unused_signal in self._signals]
+    initial_bucket_value_collection = SignalsInitialBucketValueCollection()
+    for signal in self._signals:
+      if initial_bucket_value_collection.HasBucketValuesFor(signal.__class__.__name__):
+        signal.SetGlobalBuckets(
+            initial_bucket_value_collection.GetBucketValuesFor(
+                signal.__class__.__name__))
 
   def _ResetSignalCaches(self):
     for signal in self._signals:
@@ -61,6 +70,7 @@ class SentenceSimilarityAligner(Aligner):
                signal.__class__.__name__)
 
     eta_clock = ETAClock(0, len(identifiers), "Training signals")
+    num_training_sentence_pairs = 0
     for identifier in identifiers:
       for signal in self._signals:
         signal.ResetCache()
@@ -75,6 +85,7 @@ class SentenceSimilarityAligner(Aligner):
 
       for (lang1, sid1), (lang2, sid2), are_aligned in \
           self._EnumerateTrainingSentencePairs(mdoc, reference_alignment):
+        num_training_sentence_pairs += 1
         for signal in self._signals:
           signal.AddTrainingRecord(lang1,
                                    mdoc.GetSentence(lang1, sid1),
@@ -83,7 +94,14 @@ class SentenceSimilarityAligner(Aligner):
                                    are_aligned,
                                    dictionary)
       eta_clock.Tick(1)
-    LogDebug("[SentenceSimilarityAligner] signal states");
+    LogDebug("[SentenceSimilarityAligner] %d training sentence pairs" % num_training_sentence_pairs)
+    bucket_debug = []
+    for signal in self._signals:
+      bucket_debug.append('%s %s' % (
+          signal.__class__.__name__,
+          ' '.join([str(val) for val, unused_pt in signal.GetGlobalBuckets()])))
+    LogDebug("[SentenceSimilarityAligner] bucket debug %s" % '|'.join(bucket_debug))
+    LogDebug("[SentenceSimilarityAligner] signal states")
     for signal in self._signals:
       signal.LogStateDebug()
 
@@ -172,11 +190,11 @@ class SentenceSimilarityAligner(Aligner):
     We want not to know the absolute classifier result, but how the
     result can be compared to average score of a sentence."""
     sentence_baselines = {}
-    for lang1 in self._languages:
+    for lang1 in multilingual_document.GetLanguages():
       for sid1 in range(multilingual_document.NumSentences(lang1)):
         for num in range(1, max_num_consecutive_sentences):
           random_classification_values = []
-          for lang2 in self._languages:
+          for lang2 in multilingual_document.GetLanguages():
             if lang2 == lang1:
               continue
 
@@ -193,8 +211,8 @@ class SentenceSimilarityAligner(Aligner):
                       dictionary))
           sentence1 = multilingual_document.GetSentence(lang1, sid1)
           if num == 1:
-            sentence_baselines[(lang1, sentence1)] = Average(random_classification_values)
-          sentence_baselines[(lang1, sentence1, num)] = Average(random_classification_values)
+            sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
+          sentence_baselines[(lang1, sid1, num)] = Average(random_classification_values)
     print len(sentence_baselines)
     return sentence_baselines
 
@@ -234,7 +252,6 @@ class SentenceSimilarityAligner(Aligner):
       sents2 += multilingual_document.GetSentence(lang2, sid2 + num)
 
     decision = 0
-    debug = []
     for signal, weight in zip(self._signals, self._weights):
       decision += signal.GetAggregatedMatchProbability(
           lang1,
@@ -242,4 +259,5 @@ class SentenceSimilarityAligner(Aligner):
           lang2,
           sents2,
           dictionary) * weight
+      print signal.GetAggregatedMatchProbability(lang1, sents1, lang2, sents2, dictionary), weight
     return decision

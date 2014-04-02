@@ -20,6 +20,9 @@ def DynamicAlign(multilingual_document,
     else:
       return 0
 
+  assert lang_a in multilingual_document.GetLanguages()
+  assert lang_b in multilingual_document.GetLanguages()
+
   sentences_a = multilingual_document.GetSentences(lang_a)
   sentences_b = multilingual_document.GetSentences(lang_b)
   # dpdata[A][B] is a pair: (quality, direction).
@@ -41,8 +44,10 @@ def DynamicAlign(multilingual_document,
     for sent_b in  xrange(len(sentences_b)):
       sent_content_a = multilingual_document.GetSentence(lang_a, sent_a)
       sent_content_b = multilingual_document.GetSentence(lang_b, sent_b)
-      match_baseline = sentence_baselines[(lang_a, sent_content_a)] * \
-                       sentence_baselines[(lang_b, sent_content_b)]
+
+      print sentence_baselines, (lang_a, sent_a), (lang_b, sent_b)
+      match_baseline = sentence_baselines[(lang_a, sent_a)] * \
+                       sentence_baselines[(lang_b, sent_b)]
       match_probability = get_match_probability(
                               lang_a,
                               sent_a,

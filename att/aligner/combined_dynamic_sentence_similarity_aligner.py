@@ -30,9 +30,13 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
           multilingual_document,
           dictionary)
 
-    if len(self._languages) == 2:
-      lang_a = self._languages[0]
-      lang_b = self._languages[1]
+    languages = multilingual_document.GetLanguages()
+    for language in languages:
+      assert language in self._languages
+
+    if len(languages) == 2:
+      lang_a = languages[0]
+      lang_b = languages[1]
 
       get_match_probability = \
           lambda lang_a, sent_a, lang_b, sent_b, dictionary: \
@@ -66,11 +70,11 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
                 dictionary)
     alignments = {}
     match_fu = FindUnion()
-    pivot = self._languages[:self._pivot_size]
+    pivot = languages[:self._pivot_size]
     if self._pivot_operand == 'MID':
         matches = {}
-        for lang_a in self._languages:
-          for lang_b in self._languages:
+        for lang_a in languages:
+          for lang_b in languages:
             if lang_b == lang_a:
               continue
             matches[(lang_a, lang_b)] = []
@@ -91,11 +95,11 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
                 matches[(lang_a, lang_b)].append([match[1], match[0]])
 
         match_scores = {}
-        for lang_a in self._languages:
-          for lang_b in self._languages:
+        for lang_a in languages:
+          for lang_b in languages:
             if lang_b == lang_a:
               continue
-            for lang_c in self._languages:
+            for lang_c in languages:
               if lang_b == lang_c or lang_a == lang_c:
                 continue
               for acmatch in matches[(lang_a, lang_c)]:
@@ -127,7 +131,7 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
           matches[root].append(key)
     elif self._pivot_operand == 'AND':
       all_graph_edges = []
-      for lang_a, lang_b in EnumeratePairs(self._languages):
+      for lang_a, lang_b in EnumeratePairs(languages):
         for match in DynamicAlign(
             multilingual_document,
             lang_a,
@@ -150,14 +154,15 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
         connected_subgraphs[root].append(tuple(edge))
       matches = {}
       for key in connected_subgraphs.keys():
-        if len(connected_subgraphs[key]) < len(self._languages) * 2:
+        if len(connected_subgraphs[key]) < len(languages) * 2:
           matches[key] = MaxClique(connected_subgraphs[key])
         else:
-          matches[key] = sorted(connected_subgraphs[key])[:len(self._languages) * 2]
+          # co tu sie dzieje
+          matches[key] = sorted(connected_subgraphs[key])[:len(languages) * 2]
           # TODO: we can't use the exact version of MaxClique here
     elif self._pivot_operand == 'OR':
       if self._pivot_size == 0:
-        for lang_a, lang_b in EnumeratePairs(self._languages):
+        for lang_a, lang_b in EnumeratePairs(languages):
           for match in DynamicAlign(
               multilingual_document,
               lang_a,
@@ -169,7 +174,7 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
             match_fu.AddIfNotExists(*match)
             match_fu.Union(*match)
       else:
-        for lang_a in self._languages:
+        for lang_a in languages:
           if lang_a in pivot:
             continue
           for lang_b in pivot:
