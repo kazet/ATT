@@ -29,6 +29,8 @@ class Document(object):
     return self._sentences
 
   def GetSentence(self, i):
+    if i >= len(self._sentences):
+      return ""
     return self._sentences[i]
 
   def GetLanguage(self):
