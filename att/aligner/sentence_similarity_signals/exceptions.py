@@ -1,0 +1,2 @@
+class TrainingRequiredException(Exception):
+  pass
