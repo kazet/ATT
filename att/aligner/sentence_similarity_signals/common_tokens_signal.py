@@ -16,6 +16,7 @@ class CommonTokensSignal(Signal):
     self._num_stopwords = config_dict.get('num_stopwords', 1000)
     self._tokenize_dict = {}
     self._word_statistics = {}
+    self._stopwords = {}
 
   def ProcessCorpusBeforeTraining(
       self,
@@ -58,8 +59,8 @@ class CommonTokensSignal(Signal):
       lang2, sentence2,
       unused_dictionary):
     """Compute the signal value."""
-    words1 = self._MemoizedWordTokenize(sentence1) - self._stopwords[lang1]
-    words2 = self._MemoizedWordTokenize(sentence2) - self._stopwords[lang2]
+    words1 = self._MemoizedWordTokenize(sentence1) - self._stopwords.get(lang1, set([]))
+    words2 = self._MemoizedWordTokenize(sentence2) - self._stopwords.get(lang2, set([]))
     return SetSimilarity(words1, words2)
 
   def _GetAggregator(self):
