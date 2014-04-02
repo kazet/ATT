@@ -69,6 +69,15 @@ class FastBucketAverage(object):
     self._global_sum += value
     self._global_count += 1.0
 
+  def SetGlobalBucketValues(self, values):
+    assert len(self._sums) == len(values)
+    assert len(self._counts) == len(values)
+
+    self._sums = values
+    self._counts = [1 for unused_value in values]
+    self._global_sum = sum(values)
+    self._global_count = len(values)
+
   def GetBuckets(self):
     """Return a list, one tuple for each bucket.
 

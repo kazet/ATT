@@ -16,6 +16,9 @@ class Signal(object):
         self._global_aggregator.GetBuckets():
       yield (average, 0.5 * (begin + end))
 
+  def SetGlobalBucketValues(self, values):
+      self._global_aggregator.SetGlobalBucketValues(values)
+
   def AddTrainingRecord(
       self,
       lang1,
