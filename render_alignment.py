@@ -28,10 +28,10 @@ def main():
   parser.add_argument('--output_folder',
                       help="The location of the output.",
                       required=True)
-  parser.add_argument('-l', '--languages',
+  parser.add_argument('-l', '--language',
                       nargs='+',
-                      help="The languages you want to extract from the aligned"
-                           " documents",
+                      help="The language you want to extract from the aligned"
+                           " documents (eg. -l pl -l en -l de)",
                       required=True)
   parser.add_argument('--verbose', '-v',
                       action='count',
@@ -46,7 +46,7 @@ def main():
   current_directory = os.path.dirname(__file__)
 
   filenames = RecursiveListing(args.input_folder)
-  languages = Languages.GetMultipleByCode(args.languages)
+  languages = Languages.GetMultipleByCode(args.language)
 
   LogDebug("Rendering %s%s in %s to %s",
            filenames[:20],
@@ -61,6 +61,7 @@ def main():
 
       identifier = StripNonFilenameCharacters(filename[len(args.input_folder):])
       aligned_doc = LoadTMXAlignedDocument(filename, languages)
+      print aligned_doc.GetMatches()
       output_file_path = os.path.join(
           args.output_folder,
           '%s.html' % identifier)

@@ -13,6 +13,9 @@ First, run ``. venv/bin/activate`` to enter the Python virtual environment
 
 Then, run ``train.py`` with the following options:
 
+--dictionary
+  The configuration file of the dictionary that will be used by the aligner
+  (see: :doc:`/dictionaries/index`).
 --training_corpus
    The name of the corpus you want to use for training. Remember to use
    different training and testing corpora to avoid overfitting.

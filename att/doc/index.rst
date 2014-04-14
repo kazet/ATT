@@ -15,6 +15,8 @@ Contents:
   testing_aligners
   training_aligners
   viewing_alignments
+  rendering_alignments
+  aligning
   aligners/sentence_similarity_aligner
   aligners/grow_sentence_similarity_aligner
   aligners/dynamic_sentence_similarity_aligner
@@ -27,6 +29,7 @@ Contents:
   corpora/corpus_skip
   dictionaries/index
   dictionaries/cfs_dictionary
+  dictionaries/empty_dictionary
   code/subclassing_conventions
   code/module_conventions
   code/testing

@@ -7,6 +7,9 @@ First, run ``. venv/bin/activate`` to enter the Python virtual environment
 
 Then, run ``test_aligner.py`` with the following options:
 
+--dictionary
+  The configuration file of the dictionary that will be used by the aligner
+  (see: :doc:`/dictionaries/index`).
 --corpus
    The name of the corpus you want to use for evaluation. Remember to use
    different training and testing corpora to avoid overfitting.

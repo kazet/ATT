@@ -4,8 +4,7 @@ CFS Dictionary
 
 To use the CFS Dictionary, download it (from
 http://cs.jhu.edu/~ccb/data/dictionaries/) and unpack into any directory.
-Then put the following configuration in any place where a dictionary
-is required:
+Then put the following configuration in the dictionary configuration file:
 
 .. code-block:: yaml
   :linenos:

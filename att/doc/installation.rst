@@ -12,8 +12,8 @@ ATT installation
    global ``site-packages`` directory).
 #. ``python setup.py install`` to install all required packages and ATT.
 
-After that, ``train.py``, ``test_aligner.py`` and ``render_alignment.py`` will
+After that, ``train.py``, ``test_aligner.py``, ``align.py`` and ``render_alignment.py`` will
 be available in your virtualenv.
 
 You probably want to train an aligner (:doc:`training_aligners`) and then evaluate it
-(:doc:`testing_aligners`) or use it to align a corpus (currently unavailable).
+(:doc:`testing_aligners`) or use it to align a corpus (:doc:`aligning`).
