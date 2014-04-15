@@ -82,7 +82,7 @@ class Alignment(object):
         output_file.write(u'      <prop type="Txt::Doc. No.">%s</prop>\n' % escape(identifier))
         for language, value in renderable_alignment:
           unused_sent_id, sentence = value
-          output_file.write('      <tuv lang="%s">\n' % language)
+          output_file.write('      <tuv lang="%s-01">\n' % language.GetCode().lower())
           output_file.write('        <seg>%s</seg>\n' % unicode(sentence).encode('utf-8'))
           output_file.write('      </tuv>')
         output_file.write('    </tu>\n')
