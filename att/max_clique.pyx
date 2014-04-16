@@ -10,7 +10,6 @@ def MaxClique(graph):
         edge."""
   vertices = list(set(Flatten(graph)))
   max_candidate = ()
-  print "mc subsetscall for vertices=",vertices
   for candidate in Subsets(vertices):
     good = True
     for candidate_item_1 in candidate:
