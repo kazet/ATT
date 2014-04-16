@@ -28,7 +28,7 @@ class SentenceSimilarityAligner(Aligner):
     initial_bucket_value_collection = SignalsInitialBucketValueCollection()
     for signal in self._signals:
       if initial_bucket_value_collection.HasBucketValuesFor(signal.__class__.__name__):
-        signal.SetGlobalBuckets(
+        signal.SetGlobalBucketValues(
             initial_bucket_value_collection.GetBucketValuesFor(
                 signal.__class__.__name__))
 
@@ -213,7 +213,6 @@ class SentenceSimilarityAligner(Aligner):
           if num == 1:
             sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
           sentence_baselines[(lang1, sid1, num)] = Average(random_classification_values)
-    print len(sentence_baselines)
     return sentence_baselines
 
   def GetMatchProbability(self,
@@ -259,5 +258,4 @@ class SentenceSimilarityAligner(Aligner):
           lang2,
           sents2,
           dictionary) * weight
-      print signal.GetAggregatedMatchProbability(lang1, sents1, lang2, sents2, dictionary), weight
     return decision
