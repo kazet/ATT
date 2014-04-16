@@ -45,7 +45,6 @@ def DynamicAlign(multilingual_document,
       sent_content_a = multilingual_document.GetSentence(lang_a, sent_a)
       sent_content_b = multilingual_document.GetSentence(lang_b, sent_b)
 
-      print sentence_baselines, (lang_a, sent_a), (lang_b, sent_b)
       match_baseline = sentence_baselines[(lang_a, sent_a)] * \
                        sentence_baselines[(lang_b, sent_b)]
       match_probability = get_match_probability(
