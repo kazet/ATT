@@ -17,7 +17,6 @@ class DictionaryWordsSignal(Signal):
   def __init__(self, config):
     super(DictionaryWordsSignal, self).__init__(config)
     self._tokenize_dict = {}
-    self._word_statistics = {}
 
   def ProcessCorpusBeforeTraining(
       self,
@@ -26,6 +25,7 @@ class DictionaryWordsSignal(Signal):
       training_set_size,
       dictionary):
     """Preprocess a corpus and gather English word frequency statistics."""
+    self._word_statistics = {}
     for identifier in training_corpus.GetFirstIdentifiers(training_set_size):
       multilingual_document = training_corpus.GetMultilingualDocument(
           identifier)
