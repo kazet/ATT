@@ -50,7 +50,6 @@ class CorpusPlain(Corpus):
       sentences = [unicode(sentence, encoding="utf-8", errors="ignore")
                    for sentence in open(document_path).readlines()]
       docs.append(Document(sentences, language))
-    assert len(docs) > 0
     return MultilingualDocument(docs)
 
   def GetMultilingualAlignedDocument(self, identifier):
