@@ -65,9 +65,12 @@ def main():
     output_path = os.path.join(
         args.output_folder,
         '%s.tmx' % StripNonFilenameCharacters(identifier))
-    aligner \
-        .Align(corpus.GetMultilingualDocument(identifier), dictionary) \
-        .RenderTMX(identifier, output_path)
+
+    mdoc = corpus.GetMultilingualDocument(identifier)
+    if mdoc.NumDocuments() > 0:
+      aligner \
+          .Align(mdoc, dictionary) \
+          .RenderTMX(identifier, output_path)
     eta_clock.Tick()
 
 if __name__ == "__main__":
