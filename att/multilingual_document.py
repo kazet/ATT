@@ -9,6 +9,9 @@ class MultilingualDocument(object):
   def GetLanguages(self):
     return self._document_dict.keys()
 
+  def NumDocuments(self):
+    return len(self._document_dict)
+
   def GetDocuments(self):
     return self._document_dict
 

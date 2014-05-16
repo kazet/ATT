@@ -30,6 +30,8 @@ def TuneWeights(inputs,
                 initial_temp=10,
                 temp_decrease=0.01,
                 temp_decrease_every=5):
+  if len(inputs) == 0:
+    raise Exception("Inputs for weight tuning should be non-empty")
   num_signals = len(First(inputs[0]))
   cdef float* csignals = <float*> calloc(sizeof(float), num_signals * len(inputs))
   cdef int* cdecisions = <int*> calloc(sizeof(int), len(inputs))

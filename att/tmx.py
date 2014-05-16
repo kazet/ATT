@@ -1,12 +1,14 @@
 import lxml
 import lxml.etree
 
+from att.log import LogDebug
 from att.alignment import Alignment
 from att.document import Document
 from att.language import Languages
 from att.multilingual_document import MultilingualDocument
 
 def LoadTMXAlignedDocument(identifier, languages):
+  LogDebug("[LoadTMXAlignedDocument] loading %s", identifier)
   data = ''.join(open(identifier).readlines())
 
   documents = dict([(lang, Document([], lang)) for lang in languages])

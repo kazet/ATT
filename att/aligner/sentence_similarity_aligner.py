@@ -111,6 +111,7 @@ class SentenceSimilarityAligner(Aligner):
     tuning_inputs = []
     identifiers = training_corpus.GetFirstIdentifiers(training_set_size)
     eta_clock = ETAClock(0, len(identifiers), "Preparing training set for tuning")
+    LogDebug("[SentenceSimilarityAligner] number of training documents: %s", len(identifiers))
     for identifier in identifiers:
       reference_alignment = \
         training_corpus.GetMultilingualAlignedDocument(identifier)

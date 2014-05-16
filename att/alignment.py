@@ -1,3 +1,4 @@
+import cgi
 import textwrap
 from xml.sax.saxutils import escape
 from copy import copy
@@ -83,7 +84,7 @@ class Alignment(object):
         for language, value in renderable_alignment:
           unused_sent_id, sentence = value
           output_file.write('      <tuv lang="%s-01">\n' % language.GetCode().lower())
-          output_file.write('        <seg>%s</seg>\n' % unicode(sentence).encode('utf-8'))
+          output_file.write('        <seg>%s</seg>\n' % cgi.escape(unicode(sentence).encode('utf-8')))
           output_file.write('      </tuv>')
         output_file.write('    </tu>\n')
       output_file.write('  </body>\n')
