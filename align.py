@@ -51,9 +51,22 @@ def main():
   dictionary = DictionaryFactory.MakeFromFile(args.dictionary)
   LogDebug("[align.py] loading aligner...")
   if args.trained_aligner:
-    aligner = LoadFromFile(args.trained_aligner)
+    try:
+      aligner = LoadFromFile(args.trained_aligner)
+    except Exception, e:
+      print "Unable to load trained aligner. Perhaps you supplied an aligner"
+      print "configuration file instead? Use --aligner_configuration to load"
+      print "aligner configuration file."
+
+      raise e
   elif args.aligner_configuration:
-    aligner = AlignerFactory.MakeFromFile(args.aligner_configuration)
+      aligner = AlignerFactory.MakeFromFile(args.aligner_configuration)
+    except Exception, e:
+      print "Unable to load aligner configuration file. Perhaps you supplied"
+      print "a trained aligner instead? Use --trained_aligner to align with a"
+      print "previously trained aligner."
+
+      raise e
   else:
     assert(False)
   LogDebug("[align.py] aligning...")
