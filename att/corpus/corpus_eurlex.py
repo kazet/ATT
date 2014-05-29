@@ -19,9 +19,6 @@ class CorpusEurlex(Corpus):
                                           config['identifiers_file'])
     self._config = config
 
-  def GetMultilingualDocumentAlignment(self):
-    raise NotImplementedError()
-
   def GetMultilingualDocumentIdentifiers(self):
     for line in open(self._identifiers_file):
       yield line.strip()

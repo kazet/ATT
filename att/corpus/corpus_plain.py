@@ -51,6 +51,3 @@ class CorpusPlain(Corpus):
                    for sentence in open(document_path).readlines()]
       docs.append(Document(sentences, language))
     return MultilingualDocument(docs)
-
-  def GetMultilingualAlignedDocument(self, identifier):
-    raise NotImplementedError()
