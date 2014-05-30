@@ -23,6 +23,8 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
              self._min_match_probability)
 
   def Align(self, multilingual_document, dictionary, ready_sentence_baselines=None):
+    self._ResetSignalCaches()
+
     if ready_sentence_baselines:
       sentence_baselines = ready_sentence_baselines
     else:
@@ -55,9 +57,9 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
                 self._min_match_probability,
                 dictionary):
         alignment.AddMatch(match)
+      del sentence_baselines
       return alignment
 
-    self._ResetSignalCaches()
     self._pivot_operand = 'OR'
     self._pivot_size = 2
 
@@ -200,5 +202,7 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
     alignment = Alignment(multilingual_document)
     for match in matches.values():
       alignment.AddMatch(match)
+    del match_fu
+    del sentence_baselines
     return alignment
 
