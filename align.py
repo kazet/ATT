@@ -60,6 +60,7 @@ def main():
 
       raise e
   elif args.aligner_configuration:
+    try:
       aligner = AlignerFactory.MakeFromFile(args.aligner_configuration)
     except Exception, e:
       print "Unable to load aligner configuration file. Perhaps you supplied"
@@ -84,6 +85,8 @@ def main():
       aligner \
           .Align(mdoc, dictionary) \
           .RenderTMX(identifier, output_path)
+      del alignment
+    del mdoc
     eta_clock.Tick()
 
 if __name__ == "__main__":
