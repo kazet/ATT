@@ -81,6 +81,7 @@ def DynamicAlign(multilingual_document,
       sent_a -= 1
     else:  # direction == Dir.B_SKIP
       sent_b -= 1
+  del dpdata
   return matches
 
 @AlignerFactory.Register
