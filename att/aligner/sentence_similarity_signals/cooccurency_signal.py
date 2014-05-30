@@ -32,7 +32,7 @@ class CooccurencySignal(Signal):
         len(identifiers),
         "Preprocessing CooccurencySignal")
     for identifier in identifiers:
-      self.ResetCaches()
+      self.ResetCache()
       alignment = training_corpus.GetMultilingualAlignedDocument(
           identifier)
       mdoc = alignment.GetMultilingualDocument()
@@ -70,8 +70,9 @@ class CooccurencySignal(Signal):
                              for word in words]))
     return self._tokenize_dict[sentence]
 
-  def ResetCaches(self):
+  def ResetCache(self):
     """Reset the internal per-sentence cache."""
+    del self._tokenize_dict
     self._tokenize_dict = {}
 
   def GetSimilarity(self, lang1, sentence1, lang2, sentence2, dictionary):

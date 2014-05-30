@@ -29,7 +29,7 @@ class HapaxSignal(Signal):
         len(identifiers),
         "Preprocessing HapaxSignal")
     for identifier in identifiers:
-      self.ResetCaches()
+      self.ResetCache()
       mdoc = training_corpus.GetMultilingualDocument(identifier)
       for lang in languages:
         doc = mdoc.GetDocument(lang)
@@ -52,8 +52,9 @@ class HapaxSignal(Signal):
       self._tokenize_dict[sentence] = frozenset(words)
     return self._tokenize_dict[sentence]
 
-  def ResetCaches(self):
+  def ResetCache(self):
     """Reset the internal per-sentence cache."""
+    del self._tokenize_dict
     self._tokenize_dict = {}
 
   def _GetNumHapaxen(self, words):

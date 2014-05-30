@@ -214,6 +214,7 @@ class SentenceSimilarityAligner(Aligner):
           if num == 1:
             sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
           sentence_baselines[(lang1, sid1, num)] = Average(random_classification_values)
+          del random_classification_values
     return sentence_baselines
 
   def GetMatchProbability(self,
@@ -224,7 +225,6 @@ class SentenceSimilarityAligner(Aligner):
                           sid2,
                           dictionary):
     decision = 0
-    debug = []
     for signal, weight in zip(self._signals, self._weights):
       decision += signal.GetAggregatedMatchProbability(
           lang1,

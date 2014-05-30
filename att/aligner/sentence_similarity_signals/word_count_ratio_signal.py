@@ -22,8 +22,9 @@ class WordCountRatioSignal(Signal):
       self._word_count_dict[sentence] = len(word_tokenize(sentence))
     return self._word_count_dict[sentence]
 
-  def ResetCaches(self):
+  def ResetCache(self):
     """Reset the internal per-sentence cache."""
+    del self._word_count_dict
     self._word_count_dict = {}
 
   def GetSimilarity(self,

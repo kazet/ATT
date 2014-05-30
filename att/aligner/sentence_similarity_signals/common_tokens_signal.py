@@ -49,8 +49,9 @@ class CommonTokensSignal(Signal):
       self._tokenize_dict[sentence] = frozenset(word_tokenize(sentence))
     return self._tokenize_dict[sentence]
 
-  def ResetCaches(self):
+  def ResetCache(self):
     """Reset the internal per-sentence cache."""
+    del self._tokenize_dict
     self._tokenize_dict = {}
 
   def GetSimilarity(
@@ -61,7 +62,10 @@ class CommonTokensSignal(Signal):
     """Compute the signal value."""
     words1 = self._MemoizedWordTokenize(sentence1) - self._stopwords.get(lang1, set([]))
     words2 = self._MemoizedWordTokenize(sentence2) - self._stopwords.get(lang2, set([]))
-    return SetSimilarity(words1, words2)
+    sim = SetSimilarity(words1, words2)
+    del words1
+    del words2
+    return sim
 
   def _GetAggregator(self):
     """See signal.py"""

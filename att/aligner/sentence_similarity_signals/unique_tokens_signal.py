@@ -28,8 +28,9 @@ class UniqueTokensSignal(Signal):
                            word_tokenize(sentence)))
     return self._tokenize_dict[sentence]
 
-  def ResetCaches(self):
+  def ResetCache(self):
     """Reset the internal per-sentence cache."""
+    del self._tokenize_dict
     self._tokenize_dict = {}
 
   def GetSimilarity(

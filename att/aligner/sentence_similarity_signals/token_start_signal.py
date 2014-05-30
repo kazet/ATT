@@ -28,8 +28,9 @@ class TokenStartSignal(Signal):
       self._tokenize_dict[sentence] = frozenset(tokens)
     return self._tokenize_dict[sentence]
 
-  def ResetCaches(self):
+  def ResetCache(self):
     """Reset the internal per-sentence cache."""
+    del self._tokenize_dict
     self._tokenize_dict = {}
 
   def GetSimilarity(self,
