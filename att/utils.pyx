@@ -122,6 +122,8 @@ def LongestCommonSubstring(a, b):
       result = a[i-1] + result
       i -= 1
       j -= 1
+  del a_utf8
+  del b_utf8
   return result
 
 def StripNonFilenameCharacters(name):
