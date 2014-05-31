@@ -85,7 +85,6 @@ def main():
       aligner \
           .Align(mdoc, dictionary) \
           .RenderTMX(identifier, output_path)
-      del alignment
     del mdoc
     eta_clock.Tick()
 
