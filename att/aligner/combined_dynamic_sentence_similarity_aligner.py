@@ -14,8 +14,8 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
     super(CombinedDynamicSentenceSimilarityAligner, self).__init__(config)
     self._min_match_probability = config.get('min_match_probability', 0)
     self._config = config
-    self._pivot_operand = config.get('pivot_operand', 'AND')
-    self._pivot_size = config.get('pivot_size', 0)
+    self._pivot_operand = config.get('pivot_operand', 'OR')
+    self._pivot_size = config.get('pivot_size', 2)
     LogDebug("[CombinedDynamicSentenceSimilarityAligner] "
              "pivot_operand=%s pivot_size=%d min_match_probability=%.3f",
              self._pivot_operand,
@@ -59,9 +59,6 @@ class CombinedDynamicSentenceSimilarityAligner(SentenceSimilarityAligner):
         alignment.AddMatch(match)
       del sentence_baselines
       return alignment
-
-    self._pivot_operand = 'OR'
-    self._pivot_size = 2
 
     get_match_probability = \
         lambda lang_a, sent_a, lang_b, sent_b, dictionary: \
