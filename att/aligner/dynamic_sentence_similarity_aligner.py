@@ -14,11 +14,9 @@ def DynamicAlign(multilingual_document,
 
   def GetQuality(dpdata, i, j):
     if i >= 0 and j >= 0:
-      assert dpdata[i][j] is not None
-      assert dpdata[i][j][0] is not None
-      return dpdata[i][j][0]
-    else:
-      return 0
+      if dpdata[i][j] is not None and dpdata[i][j][0] is not None:
+        return dpdata[i][j][0]
+    return 0
 
   assert lang_a in multilingual_document.GetLanguages()
   assert lang_b in multilingual_document.GetLanguages()
@@ -40,8 +38,19 @@ def DynamicAlign(multilingual_document,
   dpdata = [[None for unused_sentenceB in xrange(len(sentences_b))]
                   for unused_sentenceA in xrange(len(sentences_a))]
 
+  # Maximal % of sentence number we can go away from the diagonal
+  if len(sentences_a) < 10 or len(sentences_b) < 10:
+    max_diff = 1
+  else:
+    max_diff = 0.1
+
   for sent_a in  xrange(len(sentences_a)):
     for sent_b in  xrange(len(sentences_b)):
+      diff = abs(float(sent_a) / len(sentences_a) - float(sent_b) / len(sentences_b))
+      # if we are too far from the diagonal, exit (with implied 0)
+      if diff > max_diff:
+        continue 
+
       sent_content_a = multilingual_document.GetSentence(lang_a, sent_a)
       sent_content_b = multilingual_document.GetSentence(lang_b, sent_b)
 
@@ -71,6 +80,14 @@ def DynamicAlign(multilingual_document,
   sent_b = len(sentences_b) - 1
   matches = []
   while sent_a >= 0 and sent_b >= 0:
+    diff = abs(float(sent_a) / len(sentences_a) - float(sent_b) / len(sentences_b))
+    if diff > max_diff:
+      if float(sent_a) / len(sentences_a) >  float(sent_b) / len(sentences_b):
+        sent_a -= 1
+      else:
+        sent_b -= 1
+      continue
+
     unused_quality, direction = dpdata[sent_a][sent_b]
     if direction == Dir.MATCH:
       match = [(lang_a, sent_a), (lang_b, sent_b)]
