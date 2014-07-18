@@ -31,6 +31,11 @@ in the aligner configuration file:
    :linenos:
 
    class: DynamicSentenceSimilarityAligner
+   verification_signals: # signals, that will be used to estimate the
+                         # resulting alignment quality
+     - class: Signal1
+       signal_setting_1: signal_setting_value1
+       ...
    signals:
      - class: Signal1
        signal_setting_1: signal_setting_value1
@@ -41,4 +46,4 @@ in the aligner configuration file:
      ...
 
 
-For signal documentation, see :doc:`/aligners/sentence_similarity_aligner`.
+For signal documentation, see :doc:`/aligners/sentence_similarity_aligner_signals`.

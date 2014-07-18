@@ -4,6 +4,7 @@ import os
 import sys
 import nltk
 import argparse
+from att.utils import Average
 from att.aligner import AlignerFactory
 from att.dictionary import DictionaryFactory
 from att.eta_clock import ETAClock
@@ -75,6 +76,7 @@ def main():
   identifiers = list(corpus.GetMultilingualDocumentIdentifiers())
   LogDebug("[align.py] %d document(s) to align..." % len(identifiers))
   eta_clock = ETAClock(0, len(identifiers), "Aligning corpus")
+  verifications = []
   for identifier in identifiers:
     output_path = os.path.join(
         args.output_folder,
@@ -85,8 +87,9 @@ def main():
       aligner \
           .Align(mdoc, dictionary) \
           .RenderTMX(identifier, output_path)
+    verifications.append(aligner.Verify(mdoc, dictionary))
     del mdoc
     eta_clock.Tick()
-
+  LogInfo("[align.py] average verification result: %s", Average(verifications))
 if __name__ == "__main__":
     main()

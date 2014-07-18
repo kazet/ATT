@@ -22,18 +22,58 @@ class SentenceSimilarityAligner(Aligner):
     for signal_config in config['signals']:
       if 'runtime' in config:
         signal_config['runtime'] = config['runtime']
-
       self._signals.append(SignalFactory.Make(signal_config))
+
+    if not 'verification_signals' in config:
+      raise Exception("No verification_signals section in the aligner config.")
+
+    self._verification_signals = []
+    for signal_config in config['verification_signals']:
+      if 'runtime' in config:
+        signal_config['runtime'] = config['runtime']
+      self._verification_signals.append(SignalFactory.Make(signal_config))
+
+    if self._verification_signals == []:
+      raise Exception("No verification signals provided - we will not be able to" +
+                      "estimate the alignment quality.")
+
     self._weights = [1 for unused_signal in self._signals]
     initial_bucket_value_collection = SignalsInitialBucketValueCollection()
-    for signal in self._signals:
+    for signal in self._signals + self._verification_signals:
       if initial_bucket_value_collection.HasBucketValuesFor(signal.__class__.__name__):
         signal.SetGlobalBucketValues(
             initial_bucket_value_collection.GetBucketValuesFor(
                 signal.__class__.__name__))
 
+  def Verify(self, alignment, dictionary):
+    match_item_set = set()
+    for match in alignment.GetMatches():
+      for item in match:
+        if item in match_item_set:
+          raise Exception("Sentence exists in more than one match - the "
+                          "verification results will be fake.")
+        match_item_set.add(item)
+
+    mdoc = alignment.GetMultilingualDocument()
+    qualities = []
+    for signal in self._verification_signals:
+      for match in alignment.GetMatches():
+        values = []
+        for lang1, sid1 in match:
+          for lang2, sid2 in match:
+            if (lang1, sid1) == (lang2, sid2):
+              continue
+            values.append(signal.GetAggregatedMatchProbability(
+                lang1,
+                mdoc.GetSentence(lang1, sid1),
+                lang2,
+                mdoc.GetSentence(lang2, sid2),
+                dictionary))
+        qualities.append(Average(values))
+    return Average(qualities)
+
   def _ResetSignalCaches(self):
-    for signal in self._signals:
+    for signal in self._signals + self._verification_signals:
       signal.ResetCache()
 
   def Train(self, training_corpus, training_set_size, dictionary):
@@ -58,7 +98,7 @@ class SentenceSimilarityAligner(Aligner):
 
     # some signal might want to gather some statistical information
     # about the corpus to be able to calculate anything
-    for signal in self._signals:
+    for signal in self._signals + self._verification_signals:
       LogDebug("[SentenceSimilarityAligner] Preprocessing %s",
                signal.__class__.__name__)
       signal.ProcessCorpusBeforeTraining(
@@ -72,8 +112,7 @@ class SentenceSimilarityAligner(Aligner):
     eta_clock = ETAClock(0, len(identifiers), "Training signals")
     num_training_sentence_pairs = 0
     for identifier in identifiers:
-      for signal in self._signals:
-        signal.ResetCache()
+      self._ResetSignalCaches()
       try:
         reference_alignment = \
           training_corpus.GetMultilingualAlignedDocument(identifier)
@@ -86,7 +125,7 @@ class SentenceSimilarityAligner(Aligner):
       for (lang1, sid1), (lang2, sid2), are_aligned in \
           self._EnumerateTrainingSentencePairs(mdoc, reference_alignment):
         num_training_sentence_pairs += 1
-        for signal in self._signals:
+        for signal in self._signals + self._verification_signals:
           signal.AddTrainingRecord(lang1,
                                    mdoc.GetSentence(lang1, sid1),
                                    lang2,
@@ -96,13 +135,13 @@ class SentenceSimilarityAligner(Aligner):
       eta_clock.Tick(1)
     LogDebug("[SentenceSimilarityAligner] %d training sentence pairs" % num_training_sentence_pairs)
     bucket_debug = []
-    for signal in self._signals:
+    for signal in self._signals + self._verification_signals:
       bucket_debug.append('%s %s' % (
           signal.__class__.__name__,
           ' '.join([str(val) for val, unused_pt in signal.GetGlobalBuckets()])))
     LogDebug("[SentenceSimilarityAligner] bucket debug %s" % '|'.join(bucket_debug))
     LogDebug("[SentenceSimilarityAligner] signal states")
-    for signal in self._signals:
+    for signal in self._signals + self._verification_signals:
       signal.LogStateDebug()
 
   def _TuneSignalWeights(self, training_corpus, training_set_size, dictionary):
@@ -137,6 +176,12 @@ class SentenceSimilarityAligner(Aligner):
              '\n'.join([
                 '\t%s: %.3f' % (signal.__class__.__name__, weight)
                 for signal, weight in zip(self._signals, self._weights)]))
+
+    for weight in self._weights:
+      if weight < 0:
+        raise Exception("Negative signal weight - using it is not a good"
+                        " idea. Quitting.")
+
     if global_context.GetArgs().verbose > VerboseLevel.DEBUG_FULL:
       for identifier in training_corpus.GetMultilingualDocumentIdentifiers():
         reference_alignment = \

@@ -20,6 +20,11 @@ To use this aligner, put the following in the aligner configuration file:
      - language_code_1
      - language_code_2
      - ...
+   verification_signals: # signals, that will be used to estimate the
+                         # resulting alignment quality
+     - class: Signal1
+       signal_setting_1: signal_setting_value1
+       ...
    signals:
      - class: Signal1
        signal_setting_1: signal_setting_value1
@@ -52,5 +57,7 @@ Suggested configuration:
      - class: TokenStartSignal
      - class: UniqueTokensSignal
      - class: DictionaryWordsSignal
+   verification_signals:
+     - class: LCSSignal
 
-For signal documentation, see :doc:`/aligners/sentence_similarity_aligner`.
+For signal documentation, see :doc:`/aligners/sentence_similarity_aligner_signals`.
