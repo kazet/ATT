@@ -14,6 +14,7 @@ class CommonTokensSignal(Signal):
   def __init__(self, config_dict):
     super(CommonTokensSignal, self).__init__(config_dict)
     self._num_stopwords = config_dict.get('num_stopwords', 1000)
+    self._use_stopwords = config_dict.get('use_stopwords', False)
     self._tokenize_dict = {}
     self._word_statistics = {}
     self._stopwords = {}
@@ -25,6 +26,10 @@ class CommonTokensSignal(Signal):
       training_set_size,
       dictionary):
     """Preprocess a corpus and gather word frequency statistics."""
+
+    if not self._use_stopwords:
+      return
+
     for identifier in training_corpus.GetFirstIdentifiers(training_set_size):
       multilingual_document = training_corpus.GetMultilingualDocument(
           identifier)
@@ -60,8 +65,12 @@ class CommonTokensSignal(Signal):
       lang2, sentence2,
       unused_dictionary):
     """Compute the signal value."""
-    words1 = self._MemoizedWordTokenize(sentence1) - self._stopwords.get(lang1, set([]))
-    words2 = self._MemoizedWordTokenize(sentence2) - self._stopwords.get(lang2, set([]))
+    if self._use_stopwords:
+      words1 = self._MemoizedWordTokenize(sentence1) - self._stopwords.get(lang1, set([]))
+      words2 = self._MemoizedWordTokenize(sentence2) - self._stopwords.get(lang2, set([]))
+    else:
+      words1 = self._MemoizedWordTokenize(sentence1)
+      words2 = self._MemoizedWordTokenize(sentence2)
     sim = SetSimilarity(words1, words2)
     del words1
     del words2
