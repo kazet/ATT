@@ -30,11 +30,19 @@ class Aligner(object):
           dictionary)
       evaluation = our_alignment.Evaluate(reference_alignment)
       eta_clock.Tick()
-      verifications.append(self.Verify(our_alignment, dictionary))
+
+      verification = self.Verify(our_alignment, dictionary)
+      verifications.append(verification)
+
       precisions.append(evaluation['precision'])
       recalls.append(evaluation['recall'])
       f_measures.append(evaluation['f_measure'])
 
+      LogDebug("Current document: precision %.3f recall %.3f f-measure %.3f verification %.3f\n",
+               evaluation['precision'],
+               evaluation['recall'],
+               evaluation['f_measure'],
+               verification)
       LogDebug("Precision so far: %s\n"
                "Recall so far: %s\n"
                "F-measure so far: %s\n"
