@@ -10,7 +10,7 @@ from sentence_similarity_signals.signals_initial_bucket_value_collection import 
   SignalsInitialBucketValueCollection
 from att.global_context import global_context
 from att.language import Languages
-from att.log import LogDebug, VerboseLevel, LogDebugFull
+from att.log import LogInfo, LogDebug, VerboseLevel, LogDebugFull
 from att.utils import EnumeratePairs, Average
 
 class SentenceSimilarityAligner(Aligner):
@@ -24,18 +24,16 @@ class SentenceSimilarityAligner(Aligner):
         signal_config['runtime'] = config['runtime']
       self._signals.append(SignalFactory.Make(signal_config))
 
-    if not 'verification_signals' in config:
-      raise Exception("No verification_signals section in the aligner config.")
-
     self._verification_signals = []
-    for signal_config in config['verification_signals']:
-      if 'runtime' in config:
-        signal_config['runtime'] = config['runtime']
-      self._verification_signals.append(SignalFactory.Make(signal_config))
+    if 'verification_signals' in config:
+      for signal_config in config['verification_signals']:
+        if 'runtime' in config:
+          signal_config['runtime'] = config['runtime']
+        self._verification_signals.append(SignalFactory.Make(signal_config))
 
     if self._verification_signals == []:
-      raise Exception("No verification signals provided - we will not be able to" +
-                      "estimate the alignment quality.")
+      LogInfo("Note: No verification signals provided - we will not be able to" +
+              "estimate the alignment quality.")
 
     self._weights = [1 for unused_signal in self._signals]
     initial_bucket_value_collection = SignalsInitialBucketValueCollection()
@@ -46,6 +44,11 @@ class SentenceSimilarityAligner(Aligner):
                 signal.__class__.__name__))
 
   def Verify(self, alignment, dictionary):
+    if not self._verification_signals:
+      LogInfo("Note: we are not able to verify the alignment quality as no" +
+              " verification_signals section in the configuration has been provided.")
+      return None
+
     match_item_set = set()
     for match in alignment.GetMatches():
       for item in match:

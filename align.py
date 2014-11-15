@@ -84,10 +84,11 @@ def main():
 
     mdoc = corpus.GetMultilingualDocument(identifier)
     if mdoc.NumDocuments() > 0:
-      aligner \
-          .Align(mdoc, dictionary) \
-          .RenderTMX(identifier, output_path)
-    verifications.append(aligner.Verify(mdoc, dictionary))
+      aligned = aligner \
+          .Align(mdoc, dictionary)
+      aligned.RenderTMX(identifier, output_path)
+      verifications.append(aligner.Verify(aligned, dictionary))
+      del aligned
     del mdoc
     eta_clock.Tick()
   LogInfo("[align.py] average verification result: %s", Average(verifications))
