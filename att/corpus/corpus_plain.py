@@ -32,6 +32,11 @@ class CorpusPlain(Corpus):
           folder
           for folder in os.listdir(self._data_location)
           if os.path.isdir(os.path.join(self._data_location, folder))]
+
+    # Limits the corpus to first X documents
+    if 'limit' in config:
+      self._identifiers = self._identifiers[:config['limit']]
+
     LogDebug("[CorpusPlain] initialization finished")
 
   def GetMultilingualDocumentIdentifiers(self):
