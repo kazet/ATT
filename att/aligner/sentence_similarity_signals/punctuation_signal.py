@@ -13,7 +13,7 @@ class PunctuationSignal(Signal):
     super(PunctuationSignal, self).__init__(config_dict)
     self._characters = \
         config_dict.get('characters',
-                        ['.', ',', ':', ';', '(', ')', '[', ']', '?'])
+                        ['.', ',', ':', ';', '(', ')', '[', ']', '?', '!'])
 
   def GetSimilarity(
       self,
