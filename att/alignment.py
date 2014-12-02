@@ -57,20 +57,73 @@ class Alignment(object):
         for language, unused_sentence_id in match:
           languages.append(language)
       languages = set(languages)
-    sorted_matches = sorted(self._matches)
+
+    # Add even the languages that don't exist in particular matches to every match
+    full_matches = []
+    for match in self._matches:
+      ids = {}
+      for language in languages:
+        ids[language] = []
+
+      for language, sent_id in match:
+        ids[language].append(sent_id)
+
+      min_ids = []
+      for language in languages:
+        min_ids.append((language, min((0,) + tuple(ids[language]))))
+      all_ids = []
+      for language in languages:
+        all_ids.append((language, tuple(ids[language])))
+      full_matches.append((tuple(min_ids), tuple(all_ids)))
+
+    last = {}
+    for language in languages:
+      last[language] = 0
 
     renderable_alignment_data = []
-    for match in sorted_matches:
-      sentences = {}
+    for min_ids, all_ids in sorted(full_matches):
+      # If we omitted some sentences during alignment, add them to renderable_alignment_data
+      for language, sent_ids in all_ids:
+        if len(sent_ids) == 0:
+          continue
+
+        if min(sent_ids) >= last[language]:
+          for middle_sent_id in range(last[language] + 1, min(sent_ids)):
+            if middle_sent_id < self._multilingual_document.NumSentences(language):
+              texts = {}
+              for l in languages:
+                texts[l] = ''
+              texts[language] = self._multilingual_document \
+                  .GetDocument(language) \
+                  .GetSentence(middle_sent_id)
+            for key in texts.keys():
+              if texts[key].strip() != '':
+                renderable_alignment_data.append(sorted(texts.iteritems()))
+                break
+        else:
+          print "Unorderable alignment (sent_ids=%s)" % ', '.join([str(x) for x in sent_ids])
+        last[language] = max(sent_ids)
+
+      # Render actual match
+      texts = {}
+      for language, sent_ids in all_ids:
+        for sent_id in sorted(sent_ids):
+          if sent_id < self._multilingual_document.NumSentences(language) and sent_id is not None:
+            sentence = self._multilingual_document \
+                .GetDocument(language) \
+                .GetSentence(sent_id)
+            if language in texts:
+              texts[language] += '|' + sentence
+            else:
+              texts[language] = sentence
+
       for language in languages:
-        sentences[language] = (u'N/A', u'')
-      for language, sent_id in match:
-        if sent_id < self._multilingual_document.NumSentences(language):
-          sentences[language] = (sent_id, self \
-              ._multilingual_document \
-              .GetDocument(language) \
-              .GetSentence(sent_id))
-      renderable_alignment_data.append(sorted(sentences.iteritems()))
+        texts[language] = texts.get(language, '')
+
+      for key in texts.keys():
+        if texts[key].strip() != '':
+          renderable_alignment_data.append(sorted(texts.iteritems()))
+          break
 
     if render_type == 'TMX':
       output_file = open(output_filename, 'w')
@@ -81,8 +134,7 @@ class Alignment(object):
       for renderable_alignment in renderable_alignment_data:
         output_file.write('    <tu>\n')
         output_file.write(u'      <prop type="Txt::Doc. No.">%s</prop>\n' % escape(identifier))
-        for language, value in renderable_alignment:
-          unused_sent_id, sentence = value
+        for language, sentence in renderable_alignment:
           output_file.write('      <tuv lang="%s-01">\n' % language.GetCode().lower())
           output_file.write('        <seg>%s</seg>\n' % cgi.escape(unicode(sentence).encode('utf-8')))
           output_file.write('      </tuv>')
@@ -95,6 +147,8 @@ class Alignment(object):
           'alignment_render.html',
           { 'identifier': identifier,
             'languages': sorted(list(languages)),
+            'stats': [(language, self._multilingual_document.NumSentences(language))
+                      for language in list(languages)],
             'renderable_alignment_data': renderable_alignment_data},
           output_filename)
     else:

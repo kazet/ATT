@@ -10,8 +10,30 @@
     <table>
       <thead>
         <tr>
+          <th>
+            Language
+          </th>
+          <th>
+            Number of sentences
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for language, num_sentences in stats %}
+          <tr>
+            <td>{{ language }}</td><td>{{ num_sentences }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <br/>
+    <br/>
+
+    <table>
+      <thead>
+        <tr>
           {% for language in languages %}
-            <th class="small-header">sent. ID</th>
             <th>{{ language }}</th>
           {% endfor %}
         </tr>
@@ -19,8 +41,7 @@
       <tbody>
         {% for row in renderable_alignment_data %}
           <tr>
-            {% for unused_language, (sentence_id, sentence) in row %}
-              <td>{{ sentence_id }}</td>
+            {% for unused_language, sentence in row %}
               <td>{{ sentence }}</td>
             {% endfor %}
           </tr>
