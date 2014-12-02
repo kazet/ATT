@@ -73,7 +73,10 @@ class SentenceSimilarityAligner(Aligner):
                 mdoc.GetSentence(lang2, sid2),
                 dictionary))
         qualities.append(Average(values))
-    return Average(qualities)
+    if qualities:
+      return Average(qualities)
+    else:
+      return 0
 
   def _ResetSignalCaches(self):
     for signal in self._signals + self._verification_signals:
@@ -228,7 +231,7 @@ class SentenceSimilarityAligner(Aligner):
         self,
         multilingual_document,
         dictionary,
-        max_num_consecutive_sentences=2):
+        max_num_consecutive_sentences=3):
     """Returns a dictionary of (lang, sentid) -> baseline (what is the average
     classifier result for (sentence[lang, sentid], sentences[lang2, whatever])
     pairs) and (lang, sentid, num) -> baseline (what is the averae classifier
@@ -241,13 +244,13 @@ class SentenceSimilarityAligner(Aligner):
     sentence_baselines = {}
     for lang1 in multilingual_document.GetLanguages():
       for sid1 in range(multilingual_document.NumSentences(lang1)):
-        for num in range(1, max_num_consecutive_sentences):
+        for num in range(1, max_num_consecutive_sentences + 1):
           random_classification_values = []
           for lang2 in multilingual_document.GetLanguages():
             if lang2 == lang1:
               continue
 
-            for sid2 in range(min(multilingual_document.NumSentences(lang2), 20)):
+            for sid2 in range(min(multilingual_document.NumSentences(lang2), 30)):
               random_classification_values.append(
                   self.GetMatchProbabilityMultipleSentences(
                       multilingual_document,
