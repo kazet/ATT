@@ -54,19 +54,19 @@ class DictionaryWordsSignal(Signal):
 
   def GetSimilarity(self, lang1, sentence1, lang2, sentence2, dictionary):
     """Compute the signal value."""
-    if not hasattr(self, '_word_statistics'):
-      raise TrainingRequiredException("Cannot use DictionaryWordsSignal"
-                                      "without training")
     words1 = self._MemoizedWordTokenizeAndTranslate(
         lang1, sentence1, dictionary)
     words2 = self._MemoizedWordTokenizeAndTranslate(
         lang2, sentence2, dictionary)
     word_score_sum = 0
     for word in words1 & words2:
-      if not word in self._word_statistics:
+      if not hasattr(self, '_word_statistics'):
         word_score_sum += 1.0
       else:
-        word_score_sum += 1.0 / math.log(1 + self._word_statistics[word])
+        if not word in self._word_statistics:
+          word_score_sum += 1.0
+        else:
+          word_score_sum += 1.0 / math.log(1 + self._word_statistics[word])
     return word_score_sum / float(math.sqrt(len(sentence1) + len(sentence2)))
 
   def _GetAggregator(self):
