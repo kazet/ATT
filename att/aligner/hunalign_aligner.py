@@ -54,5 +54,5 @@ class HunalignAligner(Aligner):
         src_id, trg_id, unused_confidence = TupleSplit(line, '\t', 3)
       except ValueError:
         continue
-      alignment.AddMatch([(self._lang_a, src_id), (self._lang_b, trg_id)])
+      alignment.AddMatch([(self._lang_a, int(src_id)), (self._lang_b, int(trg_id))])
     return alignment
