@@ -10,7 +10,7 @@ from att.dictionary import DictionaryFactory
 from att.eta_clock import ETAClock
 from att.html import CopyDependencies
 from att.utils import MkdirIfNotExists, StripNonFilenameCharacters
-from att.log import LogDebug
+from att.log import LogDebug, LogInfo
 from att.pickle import LoadFromFile
 from att.corpus import CorpusFactory
 from att.global_context import global_context
@@ -33,6 +33,9 @@ def main():
   parser.add_argument('--output_folder',
                       help="The location of the alignment output.",
                       required=True)
+  parser.add_argument('--min_languages',
+                      help="Minimum number of languages in a document to align it.",
+                      default=1)
   parser.add_argument('--verbose', '-v',
                       action='count',
                       default=0,
@@ -83,12 +86,14 @@ def main():
         '%s.tmx' % StripNonFilenameCharacters(identifier))
 
     mdoc = corpus.GetMultilingualDocument(identifier)
-    if mdoc.NumDocuments() > 0:
+    if mdoc.NumDocuments() >= int(args.min_languages):
       aligned = aligner \
           .Align(mdoc, dictionary)
       aligned.RenderTMX(identifier, output_path)
       verifications.append(aligner.Verify(aligned, dictionary))
       del aligned
+    else:
+      LogDebug("[align.py] no documents")
     del mdoc
     eta_clock.Tick()
   LogInfo("[align.py] average verification result: %s", Average(verifications))
