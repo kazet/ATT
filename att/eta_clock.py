@@ -20,7 +20,9 @@ class ETAClock(object):
       elapsed = TimedeltaInSeconds(now - self._start)
       per_second = (self._value - self._min_value) / elapsed
       remaining = (self._max_value - self._value) / per_second
-      LogInfo("%s%.1f%% %s elapsed, %.2f per second, %s remaining",
+      LogInfo("[%d/%d] %s%.1f%% %s elapsed, %.2f per second, %s remaining",
+              self._value - self._min_value,
+              self._max_value,
               "[%s] " % self._prefix if self._prefix else "",
               100.0 * (self._value - self._min_value) /
                       (self._max_value - self._min_value),
