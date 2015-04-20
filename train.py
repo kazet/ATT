@@ -22,7 +22,7 @@ def main():
   parser.add_argument('--training_set_size',
                       help="The number of documents that will be taken from"
                            " the corpus to train the aligner.",
-                      default=300,
+                      default=1000,
                       type=int)
   parser.add_argument('--output',
                       help="The file trained aligner should be written to.",
