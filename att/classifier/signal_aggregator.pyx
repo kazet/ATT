@@ -26,10 +26,10 @@ def __cinit__():
 #  Returns:
 #  - an array of floats: the weights, one per signal
 def TuneWeights(inputs,
-                num_iterations=5000,
+                num_iterations=20000,
                 initial_temp=10,
                 temp_decrease=0.01,
-                temp_decrease_every=5):
+                temp_decrease_every=20):
   if len(inputs) == 0:
     raise Exception("Inputs for weight tuning should be non-empty")
   num_signals = len(First(inputs[0]))
@@ -87,7 +87,7 @@ cdef float* CTuneWeights(
   cdef float* weights = <float*> calloc(sizeof(float), num_signals)
   cdef int i
   for i in range(num_signals):
-    weights[i] = 1.0 / num_signals
+    weights[i] = CRandFloat(-0.5, 0.5) + 1.0 / num_signals
 
   cdef float temp = initial_temp
   cdef float base_quality = CEvaluateWeights(num_signals,
