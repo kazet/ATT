@@ -9,7 +9,7 @@ def DynamicAlign(multilingual_document,
                  get_match_probability,
                  min_match_probability,
                  dictionary,
-                 max_num_consecutive_sentences=3):
+                 max_num_consecutive_sentences=1):
   class Dir(object):
     A_SKIP, B_SKIP, MATCH = xrange(3)
 
@@ -61,32 +61,32 @@ def DynamicAlign(multilingual_document,
       quality_a_skip = GetQuality(dpdata, sent_a - 1, sent_b)
       quality_b_skip = GetQuality(dpdata, sent_a, sent_b - 1)
       max_quality = 0
-      for a_i in range(1, max_num_consecutive_sentences + 1):
-        for b_i in range(1, max_num_consecutive_sentences + 1):
+      for a_i in range(max_num_consecutive_sentences):
+        for b_i in range(max_num_consecutive_sentences):
           if a_i > sent_a or b_i > sent_b:
             continue
 
-          allowed_a, allowed_b = allowed_sentence_id[sent_a - a_i][sent_b - b_i]
+          allowed_a, allowed_b = allowed_sentence_id[sent_a - (a_i + 1)][sent_b - (b_i + 1)]
 
 #          if sent_a - a_i <= allowed_a or sent_b - b_i <= allowed_b:
 #            continue
 
-          match_baseline = sentence_baselines[(lang_a, sent_a - a_i, a_i)] * \
-                           sentence_baselines[(lang_b, sent_b - b_i, b_i)]
+          match_baseline = sentence_baselines[(lang_a, sent_a - a_i, a_i + 1)] * \
+                           sentence_baselines[(lang_b, sent_b - b_i, b_i + 1)]
           match_probability = get_match_probability(
                                   lang_a,
                                   sent_a - a_i,
                                   lang_b,
                                   sent_b - b_i,
                                   dictionary,
-                                  a_i,
-                                  b_i)
-          quality_match = GetQuality(dpdata, sent_a - a_i, sent_b - b_i) + \
+                                  a_i + 1,
+                                  b_i + 1)
+          quality_match = GetQuality(dpdata, sent_a - (a_i + 1), sent_b - (b_i + 1)) + \
                           match_probability * match_probability / match_baseline
           if match_probability * match_probability / match_baseline >= \
                min_match_probability and quality_match > max_quality:
             max_quality = max(max_quality, quality_match)
-            dpdata[sent_a][sent_b] = (quality_match, Dir.MATCH, a_i, b_i)
+            dpdata[sent_a][sent_b] = (quality_match, Dir.MATCH, a_i + 1, b_i + 1)
             allowed_sentence_id[sent_a][sent_b] = (sent_a, sent_b)
       if quality_b_skip > max_quality:
         max_quality = quality_b_skip
