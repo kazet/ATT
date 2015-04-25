@@ -43,6 +43,9 @@ class SentenceSimilarityAligner(Aligner):
             initial_bucket_value_collection.GetBucketValuesFor(
                 signal.__class__.__name__))
 
+  def GetSignals(self):
+    return self._signals
+
   def Verify(self, alignment, dictionary):
     if not self._verification_signals:
       LogInfo("Note: we are not able to verify the alignment quality as no" +
@@ -250,7 +253,7 @@ class SentenceSimilarityAligner(Aligner):
             if lang2 == lang1:
               continue
 
-            for sid2 in range(min(multilingual_document.NumSentences(lang2), 30)):
+            for sid2 in range(min(multilingual_document.NumSentences(lang2), 50)):
               random_classification_values.append(
                   self.GetMatchProbabilityMultipleSentences(
                       multilingual_document,
@@ -259,9 +262,10 @@ class SentenceSimilarityAligner(Aligner):
                       num,
                       lang2,
                       sid2,
-                      num,
+                      1,
                       dictionary))
-          sentence1 = multilingual_document.GetSentence(lang1, sid1)
+          if len(random_classification_values) == 0:
+            raise Exception("No sentences in %s, cannot calculate baselines" % lang2)
           if num == 1:
             sentence_baselines[(lang1, sid1)] = Average(random_classification_values)
           sentence_baselines[(lang1, sid1, num)] = Average(random_classification_values)

@@ -53,6 +53,12 @@ class Signal(object):
         min_bucket_size_location = str(key)
       bucket_sizes.extend(value.GetBucketSizes())
 
+      LogDebug("[%s] langs=%s %s",
+               self.__class__.__name__,
+               key,
+               ' '.join([str(average) for average, begin, end, unused_sum, unused_num in value.GetBuckets()]))
+
+
     LogDebug("[%s] min bucket size=%s (%s), median bucket size=%.3f",
              self.__class__.__name__,
              min_bucket_size,

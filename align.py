@@ -36,6 +36,10 @@ def main():
   parser.add_argument('--min_languages',
                       help="Minimum number of languages in a document to align it.",
                       default=1)
+  parser.add_argument('--length_difference_threshold',
+                      help="If |min document length - max document length| > |average document length| * " +
+                           "length_difference_threshold, the document will be ignored.",
+                      default=None)
   parser.add_argument('--verbose', '-v',
                       action='count',
                       default=0,
@@ -74,6 +78,11 @@ def main():
       raise e
   else:
     assert(False)
+
+  LogDebug("[align.py] signal states:")
+  for signal in aligner.GetSignals():
+    signal.LogStateDebug()
+
   LogDebug("[align.py] aligning...")
   MkdirIfNotExists(args.output_folder)
   identifiers = list(corpus.GetMultilingualDocumentIdentifiers())
@@ -81,21 +90,34 @@ def main():
   eta_clock = ETAClock(0, len(identifiers), "Aligning corpus")
   verifications = []
   for identifier in identifiers:
+    eta_clock.Tick()
     output_path = os.path.join(
         args.output_folder,
         '%s.tmx' % StripNonFilenameCharacters(identifier))
 
     mdoc = corpus.GetMultilingualDocument(identifier)
+
+    lengths = [mdoc.NumSentences(language) for language in mdoc.GetLanguages()]
+
+    if args.length_difference_threshold:
+      if (max(lengths) - min(lengths)) / Average(lengths) > float(args.length_difference_threshold):
+        LogInfo("[align.py] max_length=%s min_length=%s, ignored", max(lengths), min(lengths))
+        continue
+
     if mdoc.NumDocuments() >= int(args.min_languages):
       aligned = aligner \
           .Align(mdoc, dictionary)
       aligned.RenderTMX(identifier, output_path)
-      verifications.append(aligner.Verify(aligned, dictionary))
+      verification = aligner.Verify(aligned, dictionary)
+      if verification is not None:
+        verifications.append(verification)
       del aligned
     else:
       LogDebug("[align.py] no documents")
     del mdoc
-    eta_clock.Tick()
-  LogInfo("[align.py] average verification result: %s", Average(verifications))
+  if len(verifications) > 0:
+    LogInfo("[align.py] average verification result: %s", Average(verifications))
+  else:
+    LogInfo("[align.py] average verification result not available - no verifications")
 if __name__ == "__main__":
     main()
