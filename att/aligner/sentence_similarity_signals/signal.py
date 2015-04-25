@@ -10,6 +10,7 @@ class Signal(object):
   def __init__(self, unused_config_dict):
     self._aggregators = {}
     self._global_aggregator = self._GetAggregator()
+    self._use_per_language_aggregators = False
 
   def GetGlobalBuckets(self):
     for average, begin, end, unused_sum, unused_num in \
@@ -30,11 +31,12 @@ class Signal(object):
     """Add one training record (two sentences in two different languages
     plus an information if the sentences should be aligned or not)
     to any models the signal has."""
-    if not (lang1, lang2) in self._aggregators:
-      self._aggregators[(lang1, lang2)] = self._GetAggregator()
-    self._aggregators[(lang1, lang2)].Aggregate(
-        self.GetSimilarity(lang1, sent1, lang2, sent2, dictionary),
-        are_aligned)
+    if self._use_per_language_aggregators:
+      if not (lang1, lang2) in self._aggregators:
+        self._aggregators[(lang1, lang2)] = self._GetAggregator()
+      self._aggregators[(lang1, lang2)].Aggregate(
+          self.GetSimilarity(lang1, sent1, lang2, sent2, dictionary),
+          are_aligned)
     self._global_aggregator.Aggregate(
         self.GetSimilarity(lang1, sent1, lang2, sent2, dictionary),
         are_aligned)
@@ -43,7 +45,7 @@ class Signal(object):
     """Prints a short signal state description."""
     LogDebug("[%s] global aggregator: %s",
              self.__class__.__name__,
-             str(self._global_aggregator))
+             ' '.join([str(average) for average, begin, end, unused_sum, unused_num in self._global_aggregator.GetBuckets()]))
     min_bucket_size = self._global_aggregator.MinBucketSize()
     min_bucket_size_location = 'global'
     bucket_sizes = self._global_aggregator.GetBucketSizes()
@@ -75,16 +77,17 @@ class Signal(object):
     if we would look only at the value of this signal. The trained model will
     be used to figure the probability out."""
     similarity = self.GetSimilarity(lang1, sent1, lang2, sent2, dictionary)
-    if not (lang1, lang2) in self._aggregators:
-      return self._global_aggregator.Get(similarity)
-
-    if self._aggregators[(lang1, lang2)].HasEnoughBuckets(similarity):
-      return self._aggregators[(lang1, lang2)].Get(similarity)
-    else:
-      if self._global_aggregator.HasEnoughBuckets(similarity):
+    if self._use_per_language_aggregators:
+      if not (lang1, lang2) in self._aggregators:
         return self._global_aggregator.Get(similarity)
-      else:
-        return self._global_aggregator.GetGlobalAverage()
+
+      if self._aggregators[(lang1, lang2)].HasEnoughBuckets(similarity):
+        return self._aggregators[(lang1, lang2)].Get(similarity)
+
+    if self._global_aggregator.HasEnoughBuckets(similarity):
+      return self._global_aggregator.Get(similarity)
+    else:
+      return self._global_aggregator.GetGlobalAverage()
 
   def ProcessCorpusBeforeTraining(self,
                                   unused_languages,
