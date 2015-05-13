@@ -44,20 +44,8 @@ def DynamicAlign(multilingual_document,
   allowed_sentence_id = [[(-1, -1) for unused_sentenceB in xrange(len(sentences_b))]
                                    for unused_sentenceA in xrange(len(sentences_a))]
 
-  # Maximal % of sentence number we can go away from the diagonal
-  if len(sentences_a) < 10 or len(sentences_b) < 10:
-    max_diff = 1
-  else:
-    max_diff = 1
-
   for sent_a in  xrange(len(sentences_a)):
     for sent_b in  xrange(len(sentences_b)):
-      # if we are too far from the diagonal, exit (with implied 0)
-      #
-      # diff = abs(float(sent_a) / len(sentences_a) - float(sent_b) / len(sentences_b))
-      # if diff > max_diff:
-      #   continue 
-
       quality_a_skip = GetQuality(dpdata, sent_a - 1, sent_b)
       quality_b_skip = GetQuality(dpdata, sent_a, sent_b - 1)
       max_quality = 0
@@ -68,11 +56,9 @@ def DynamicAlign(multilingual_document,
 
           allowed_a, allowed_b = allowed_sentence_id[sent_a - (a_i + 1)][sent_b - (b_i + 1)]
 
-#          if sent_a - a_i <= allowed_a or sent_b - b_i <= allowed_b:
-#            continue
-
           match_baseline = sentence_baselines[(lang_a, sent_a - a_i, a_i + 1)] * \
                            sentence_baselines[(lang_b, sent_b - b_i, b_i + 1)]
+
           match_probability = get_match_probability(
                                   lang_a,
                                   sent_a - a_i,
@@ -83,11 +69,13 @@ def DynamicAlign(multilingual_document,
                                   b_i + 1)
           quality_match = GetQuality(dpdata, sent_a - (a_i + 1), sent_b - (b_i + 1)) + \
                           match_probability * match_probability / match_baseline
+
           if match_probability * match_probability / match_baseline >= \
                min_match_probability and quality_match > max_quality:
             max_quality = max(max_quality, quality_match)
             dpdata[sent_a][sent_b] = (quality_match, Dir.MATCH, a_i + 1, b_i + 1)
             allowed_sentence_id[sent_a][sent_b] = (sent_a, sent_b)
+
       if quality_b_skip > max_quality:
         max_quality = quality_b_skip
         dpdata[sent_a][sent_b] = (quality_b_skip, Dir.B_SKIP, None, None)
@@ -101,14 +89,6 @@ def DynamicAlign(multilingual_document,
   sent_b = len(sentences_b) - 1
   matches = []
   while sent_a >= 0 and sent_b >= 0:
-#    diff = abs(float(sent_a) / len(sentences_a) - float(sent_b) / len(sentences_b))
-#    if diff > max_diff:
-#      if float(sent_a) / len(sentences_a) >  float(sent_b) / len(sentences_b):
-#        sent_a -= 1
-#      else:
-#        sent_b -= 1
-#      continue
-
     unused_quality, direction, num_sent_a, num_sent_b = dpdata[sent_a][sent_b]
     if direction == Dir.MATCH:
       match = []
