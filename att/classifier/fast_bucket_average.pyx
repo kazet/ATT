@@ -70,11 +70,13 @@ class FastBucketAverage(object):
     self._global_count += 1.0
 
   def SetGlobalBucketValues(self, values):
+    fake_bucket_size = 100
+
     assert len(self._sums) == len(values)
     assert len(self._counts) == len(values)
 
-    self._sums = values
-    self._counts = [1 for unused_value in values]
+    self._sums = [value * fake_bucket_size for value in values]
+    self._counts = [fake_bucket_size for unused_value in values]
     self._global_sum = sum(values)
     self._global_count = len(values)
 
