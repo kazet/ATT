@@ -84,6 +84,11 @@ cdef float* CTuneWeights(
     float initial_temp,
     float temp_decrease,
     float temp_decrease_every):
+  sys.stdout.write("num_signals=%d num_records=%d num_iterations=%d" % (
+      num_signals,
+      num_records,
+      num_iterations,
+  ))
   cdef float* weights = <float*> calloc(sizeof(float), num_signals)
   cdef int i
   for i in range(num_signals):
