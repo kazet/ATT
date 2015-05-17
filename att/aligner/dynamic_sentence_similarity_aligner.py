@@ -9,7 +9,7 @@ def DynamicAlign(multilingual_document,
                  get_match_probability,
                  min_match_probability,
                  dictionary,
-                 max_num_consecutive_sentences=1):
+                 max_num_consecutive_sentences=3):
   class Dir(object):
     A_SKIP, B_SKIP, MATCH = xrange(3)
 
