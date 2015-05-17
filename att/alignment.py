@@ -17,6 +17,8 @@ class Alignment(object):
     else:
       self._matches = []
 
+    self._scores = {}
+
   def GetMultilingualDocument(self):
     return self._multilingual_document
 
@@ -25,6 +27,12 @@ class Alignment(object):
 
   def GetMatches(self):
     return self._matches
+
+  def NumMatches(self):
+    return len(self._matches)
+
+  def SetScore(self, match_id, score):
+    self._scores[match_id] = score
 
   def __str__(self):
     wrapper = textwrap.TextWrapper(initial_indent='  * ',
@@ -60,6 +68,7 @@ class Alignment(object):
 
     # Add even the languages that don't exist in particular matches to every match
     full_matches = []
+    i = 0
     for match in self._matches:
       ids = {}
       for language in languages:
@@ -74,14 +83,19 @@ class Alignment(object):
       all_ids = []
       for language in languages:
         all_ids.append((language, tuple(ids[language])))
-      full_matches.append((tuple(min_ids), tuple(all_ids)))
+
+      if i in self._scores:
+        full_matches.append((tuple(min_ids), tuple(all_ids), self._scores[i]))
+      else:
+        full_matches.append((tuple(min_ids), tuple(all_ids), None))
+      i += 1
 
     last = {}
     for language in languages:
       last[language] = 0
 
     renderable_alignment_data = []
-    for min_ids, all_ids in sorted(full_matches):
+    for min_ids, all_ids, score in sorted(full_matches):
       # If we omitted some sentences during alignment, add them to renderable_alignment_data
       for language, sent_ids in all_ids:
         if len(sent_ids) == 0:
@@ -98,7 +112,7 @@ class Alignment(object):
                   .GetSentence(middle_sent_id)
             for key in texts.keys():
               if texts[key].strip() != '':
-                renderable_alignment_data.append(sorted(texts.iteritems()))
+                renderable_alignment_data.append((sorted(texts.iteritems()), None))
                 break
         else:
           print "Unorderable alignment (sent_ids=%s)" % ', '.join([str(x) for x in sent_ids])
@@ -122,7 +136,7 @@ class Alignment(object):
 
       for key in texts.keys():
         if texts[key].strip() != '':
-          renderable_alignment_data.append(sorted(texts.iteritems()))
+          renderable_alignment_data.append((sorted(texts.iteritems()), score))
           break
 
     if render_type == 'TMX':
@@ -131,9 +145,10 @@ class Alignment(object):
       output_file.write('<!DOCTYPE tmx SYSTEM "tmx14.dtd">\n')
       output_file.write('<tmx version="1.4">\n')
       output_file.write('  <body>\n')
-      for renderable_alignment in renderable_alignment_data:
+      for renderable_alignment, score in renderable_alignment_data:
         output_file.write('    <tu>\n')
         output_file.write(u'      <prop type="Txt::Doc. No.">%s</prop>\n' % escape(identifier))
+        output_file.write(u'      <prop type="Score">%s</prop>\n' % escape(str(score)))
         for language, sentence in renderable_alignment:
           output_file.write('      <tuv lang="%s-01">\n' % language.GetCode().lower())
           output_file.write('        <seg>%s</seg>\n' % cgi.escape(unicode(sentence).encode('utf-8')))

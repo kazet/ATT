@@ -62,6 +62,8 @@ class SentenceSimilarityAligner(Aligner):
 
     mdoc = alignment.GetMultilingualDocument()
     qualities = []
+    i = 0
+    scores = {}
     for signal in self._verification_signals:
       for match in alignment.GetMatches():
         values = []
@@ -76,10 +78,19 @@ class SentenceSimilarityAligner(Aligner):
                 mdoc.GetSentence(lang2, sid2),
                 dictionary))
         qualities.append(Average(values))
+        scores[i] = Average(values)
+        i += 1
+
     if qualities:
-      return Average(qualities)
+      return Average(qualities), scores
     else:
-      return 0
+      return 0, scores
+
+  def SaveVerifications(self, alignment, dictionary):
+    unused_quality, scores = self.Verify(alignment, dictionary)
+
+    for i, score in scores.items():
+      alignment.SetScore(i, score)
 
   def _ResetSignalCaches(self):
     for signal in self._signals + self._verification_signals:
@@ -201,7 +212,7 @@ class SentenceSimilarityAligner(Aligner):
           LogDebugFull("[SentenceSimilarityAligner] id1=%s, id2=%s, sentence1=`%s', sentence2=`%s'",
                    sid1,
                    sid2,
-                   unicode(mdoc.GetSentence(lang1, sid1)).strip(), 
+                   unicode(mdoc.GetSentence(lang1, sid1)).strip(),
                    unicode(mdoc.GetSentence(lang2, sid2)).strip())
           decision = 0
           signals_debug = []

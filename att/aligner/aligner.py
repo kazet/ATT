@@ -31,7 +31,7 @@ class Aligner(object):
       evaluation = our_alignment.Evaluate(reference_alignment)
       eta_clock.Tick()
 
-      verification = self.Verify(our_alignment, dictionary)
+      verification, unused_scores = self.Verify(our_alignment, dictionary)
       verifications.append(verification)
 
       precisions.append(evaluation['precision'])

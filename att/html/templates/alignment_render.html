@@ -36,14 +36,16 @@
           {% for language in languages %}
             <th>{{ language }}</th>
           {% endfor %}
+          <th>Score</th>
         </tr>
       </thead>
       <tbody>
-        {% for row in renderable_alignment_data %}
+        {% for row, score in renderable_alignment_data %}
           <tr>
             {% for unused_language, sentence in row %}
               <td>{{ sentence }}</td>
             {% endfor %}
+            <td>{{ '%.2f' % score|float }}</td>
           </tr>
         {% endfor %}
       </tbody>

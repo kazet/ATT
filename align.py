@@ -107,8 +107,9 @@ def main():
     if mdoc.NumDocuments() >= int(args.min_languages):
       aligned = aligner \
           .Align(mdoc, dictionary)
+      aligner.SaveVerifications(aligned, dictionary)
       aligned.RenderTMX(identifier, output_path)
-      verification = aligner.Verify(aligned, dictionary)
+      verification, unused_scores = aligner.Verify(aligned, dictionary)
       if verification is not None:
         verifications.append(verification)
       del aligned
