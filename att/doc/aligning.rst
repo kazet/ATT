@@ -7,7 +7,7 @@ If you want to align a document, use ``align.py``.
 First, run ``. venv/bin/activate`` to enter the Python virtual environment
 (if you didn't already create it, refer to :doc:`/installation`).
 
-Then, run ``render_alignment.py`` with the following options:
+Then, run ``align.py`` with the following options:
 
 --dictionary
   The configuration file of the dictionary that will be used by the aligner

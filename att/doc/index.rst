@@ -6,6 +6,9 @@
 Welcome to ATT's documentation!
 ===============================
 
+The documentation may not be 100% up-to-date. If something goes
+wrong, please contact me at kz292663@students.mimuw.edu.pl.
+
 Contents:
 
 .. toctree::
